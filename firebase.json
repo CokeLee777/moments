@@ -1,0 +1,19 @@
+{
+  "functions": [
+    {
+      "source": "apps/functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "pnpm --filter @moments/shared build",
+        "pnpm --filter @moments/functions build"
+      ]
+    }
+  ]
+}
