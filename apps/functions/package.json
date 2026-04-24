@@ -13,10 +13,10 @@
     "dev": "tsc --watch"
   },
   "devDependencies": {
+    "@moments/shared": "workspace:*",
     "typescript": "*"
   },
   "dependencies": {
-    "@moments/shared": "workspace:*",
     "firebase-functions": "^7.2.5"
   }
 }

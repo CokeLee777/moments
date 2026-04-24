@@ -29,13 +29,13 @@ importers:
 
   apps/functions:
     dependencies:
-      '@moments/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       firebase-functions:
         specifier: ^7.2.5
         version: 7.2.5(firebase-admin@13.8.0)
     devDependencies:
+      '@moments/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       typescript:
         specifier: '*'
         version: 6.0.3
