@@ -12,6 +12,9 @@
     "lint": "eslint src",
     "dev": "tsc --watch"
   },
+  "devDependencies": {
+    "typescript": "*"
+  },
   "dependencies": {
     "@moments/shared": "workspace:*",
     "firebase-functions": "^7.2.5"

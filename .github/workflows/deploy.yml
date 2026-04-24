@@ -10,6 +10,10 @@ on:
       - 'firebase.json'
       - 'pnpm-lock.yaml'
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Deploy Firebase Functions

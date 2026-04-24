@@ -35,6 +35,10 @@ importers:
       firebase-functions:
         specifier: ^7.2.5
         version: 7.2.5(firebase-admin@13.8.0)
+    devDependencies:
+      typescript:
+        specifier: '*'
+        version: 6.0.3
 
   apps/mobile:
     dependencies:
