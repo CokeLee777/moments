@@ -13,7 +13,6 @@
     "dev": "tsc --watch"
   },
   "devDependencies": {
-    "@moments/shared": "workspace:*",
     "typescript": "*"
   },
   "dependencies": {
