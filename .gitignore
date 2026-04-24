@@ -6,6 +6,7 @@ node_modules/
 dist/
 lib/
 .expo/
+src/**/*.js
 
 # Turbo
 .turbo/
