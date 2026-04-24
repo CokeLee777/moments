@@ -13,7 +13,7 @@
       "predeploy": [
         "pnpm --filter @moments/shared build",
         "pnpm --filter @moments/functions build",
-        "pnpm deploy --filter @moments/functions --prod apps/functions-deploy"
+        "pnpm deploy --filter @moments/functions --prod --legacy apps/functions-deploy"
       ]
     }
   ]
