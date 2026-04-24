@@ -38,4 +38,4 @@ jobs:
         run: pnpm --filter @moments/functions build
 
       - name: Deploy to Firebase
-        run: npx firebase-tools@14 deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
+        run: npx firebase-tools@14 deploy --only functions --force --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
