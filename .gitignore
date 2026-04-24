@@ -6,6 +6,7 @@ node_modules/
 dist/
 lib/
 .expo/
+apps/functions-deploy/
 
 # Turbo
 .turbo/
