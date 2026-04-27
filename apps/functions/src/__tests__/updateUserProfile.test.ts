@@ -1,5 +1,6 @@
 import { runUpdateUserProfile } from '../updateUserProfile.js';
 import * as firestoreModule from '../lib/firestore.js';
+import type { TopicCategory } from '@moments/shared';
 
 jest.mock('../lib/firestore.js', () => ({ upsertUserProfile: jest.fn().mockResolvedValue(undefined) }));
 
@@ -11,7 +12,7 @@ describe('runUpdateUserProfile', () => {
   const validInput = {
     uid: 'uid1',
     fcmToken: 'token123',
-    topics: ['ai', 'it'] as const,
+    topics: ['ai', 'it'] as TopicCategory[],
     notificationHours: [8, 21],
   };
 
