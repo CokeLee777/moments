@@ -1,4 +1,4 @@
-import type { TopicCategory } from './topic';
+import type { TopicCategory } from './topic.js';
 
 export interface UserProfile {
   fcmToken: string;
