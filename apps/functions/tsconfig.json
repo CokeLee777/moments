@@ -7,7 +7,7 @@
     "outDir": "./lib",
     "rootDir": "./src",
     "lib": ["ES2022"],
-    "types": ["jest", "node"],
+    "types": ["jest"],
     "isolatedModules": true
   },
   "include": ["src"],
