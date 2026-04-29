@@ -8,8 +8,8 @@ interface Props {
 
 export function TrendCard({ summary }: Props) {
   return (
-    <View className="mx-2.5 mb-2.5 rounded-2xl overflow-hidden">
-      <View className="bg-navy p-3.5 rounded-2xl">
+    <View className="mx-2.5 mb-2.5 rounded-[20px] overflow-hidden">
+      <View className="bg-navy p-3.5 rounded-[20px]">
         {/* 배경 그라데이션 — top-right indigo */}
         <LinearGradient
           colors={['rgba(99,102,241,0.55)', 'transparent']}
