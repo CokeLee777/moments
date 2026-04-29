@@ -70,7 +70,7 @@ function LoadingScreen() {
               width: s(5),
               height: s(5),
               borderRadius: s(5),
-              backgroundColor: 'rgba(255,255,255,0.5)',
+              backgroundColor: 'rgba(255,255,255,0.35)',
             }}
           />
         ))}
