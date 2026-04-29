@@ -28,6 +28,7 @@ export async function handleGoogleResponse(
 ): Promise<void> {
   if (response?.type !== 'success') return;
   const { id_token } = response.params;
+  if (!id_token) throw new Error('Google sign-in did not return an id_token');
   const credential = GoogleAuthProvider.credential(id_token);
   await signInWithCredential(auth, credential);
 }

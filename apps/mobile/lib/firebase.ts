@@ -1,5 +1,5 @@
 import { getApps, initializeApp } from 'firebase/app';
-import { initializeAuth } from 'firebase/auth';
+import { type Persistence, initializeAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -13,23 +13,23 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Custom persistence for AsyncStorage in React Native
+// Firebase v12 does not export getReactNativePersistence.
+// Implement the internal persistence interface using AsyncStorage.
 const asyncStoragePersistence = {
-  type: 'LOCAL',
-  async getItem(key: string) {
-    return (await AsyncStorage.getItem(key)) || null;
+  type: 'LOCAL' as Persistence['type'],
+  async getItem(key: string): Promise<string | null> {
+    return AsyncStorage.getItem(key);
   },
-  async setItem(key: string, value: string) {
-    await AsyncStorage.setItem(key, value);
+  async setItem(key: string, value: string): Promise<void> {
+    return AsyncStorage.setItem(key, value);
   },
-  async removeItem(key: string) {
-    await AsyncStorage.removeItem(key);
+  async removeItem(key: string): Promise<void> {
+    return AsyncStorage.removeItem(key);
   },
-};
+} as unknown as Persistence;
 
 export const auth = initializeAuth(app, {
-  // @ts-ignore - custom persistence implementation for React Native
-  persistence: [asyncStoragePersistence],
+  persistence: asyncStoragePersistence,
 });
 
 export const db = getFirestore(app);
