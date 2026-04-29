@@ -18,6 +18,8 @@ src/**/*.js
 firebase-debug.log
 firestore-debug.log
 .firebaserc.local
+apps/mobile/google-services.json
+apps/mobile/GoogleService-Info.plist
 
 # Environment
 .env
