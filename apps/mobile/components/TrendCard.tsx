@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { TrendSummary } from '@moments/shared';
+import { ms } from '../lib/scale';
 
 interface Props {
   summary: TrendSummary;
@@ -43,15 +44,15 @@ export function TrendCard({ summary }: Props) {
         {/* 제목 */}
         <Text
           className="text-white font-extrabold leading-snug mb-1.5"
-          style={{ fontSize: 12.5, letterSpacing: -0.3 }}
+          style={{ fontSize: ms(12.5), letterSpacing: -0.3 }}
         >
           {summary.title}
         </Text>
 
         {/* 요약 본문 */}
         <Text
-          className="text-[9px] leading-relaxed"
-          style={{ color: 'rgba(255,255,255,0.68)' }}
+          numberOfLines={5}
+          className="text-[9px] leading-relaxed text-white/70"
         >
           {summary.summary}
         </Text>
