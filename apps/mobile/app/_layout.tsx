@@ -8,6 +8,7 @@ import {
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { getUserProfile } from '../lib/firestore';
+import { registerForPushNotifications, setupNotificationListeners } from '../lib/notifications';
 import { ms, s, vs } from '../lib/scale';
 import '../global.css';
 
@@ -103,6 +104,14 @@ export default function RootLayout() {
       router.replace(destination as never);
     }
   }, [authReady, fontsLoaded, destination]);
+
+  useEffect(() => {
+    if (!authReady) return;
+    if (!auth.currentUser) return;
+    registerForPushNotifications();
+    const cleanup = setupNotificationListeners();
+    return cleanup;
+  }, [authReady]);
 
   return (
     <>
