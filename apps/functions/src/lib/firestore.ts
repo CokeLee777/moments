@@ -27,7 +27,7 @@ export async function getUsersWithNotificationHour(
 ): Promise<Array<{ uid: string } & UserProfile>> {
   const snap = await db
     .collection('users')
-    .where('notificationHours', 'array-contains', hour)
+    .where('notificationTimes', 'array-contains', hour)
     .get();
   return snap.docs
     .filter((doc) => (doc.data() as UserProfile).fcmToken)

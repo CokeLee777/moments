@@ -64,8 +64,8 @@ describe('getUsersWithNotificationHour', () => {
   it('해당 알림 시간을 가진 FCM 토큰 있는 사용자를 반환한다', async () => {
     const mockSnapshot = {
       docs: [
-        { id: 'uid1', data: () => ({ fcmToken: 'token1', topics: ['ai'], notificationHours: [8], updatedAt: '' }) },
-        { id: 'uid2', data: () => ({ fcmToken: '', topics: ['it'], notificationHours: [8], updatedAt: '' }) },
+        { id: 'uid1', data: () => ({ fcmToken: 'token1', topics: ['ai'], notificationTimes: [8], updatedAt: '' }) },
+        { id: 'uid2', data: () => ({ fcmToken: '', topics: ['it'], notificationTimes: [8], updatedAt: '' }) },
       ],
     };
     mockWhere.mockReturnValue({ get: jest.fn().mockResolvedValue(mockSnapshot) });
@@ -78,7 +78,7 @@ describe('getUsersWithNotificationHour', () => {
 
 describe('upsertUserProfile', () => {
   it('users/{uid} 문서를 set한다', async () => {
-    const profile = { fcmToken: 'tok', topics: ['ai' as const], notificationHours: [8], updatedAt: '' };
+    const profile = { fcmToken: 'tok', topics: ['ai' as const], notificationTimes: [8], updatedAt: '' };
     await upsertUserProfile('uid1', profile);
     expect(mockDoc).toHaveBeenCalledWith('uid1');
     expect(mockSet).toHaveBeenCalledWith(profile);

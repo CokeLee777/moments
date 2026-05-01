@@ -1,30 +1,34 @@
-import { messaging } from './admin.js';
 import type { TrendSummary } from '@moments/shared';
 
-const EXPIRED_TOKEN_CODES = new Set([
-  'messaging/registration-token-not-registered',
-  'messaging/invalid-registration-token',
-]);
+const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
+
+interface ExpoPushReceipt {
+  status: 'ok' | 'error';
+  details?: { error?: string };
+}
 
 export async function sendTrendNotification(
-  fcmToken: string,
+  expoPushToken: string,
   summary: TrendSummary
 ): Promise<{ success: boolean; tokenExpired: boolean }> {
   try {
-    await messaging.send({
-      token: fcmToken,
-      notification: {
+    const res = await fetch(EXPO_PUSH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: expoPushToken,
         title: summary.title,
         body: summary.summary.slice(0, 150),
-      },
-      data: {
-        trendId: summary.id,
-        topicId: summary.topicId,
-      },
+        data: { trendId: summary.id, topicId: summary.topicId },
+      }),
     });
-    return { success: true, tokenExpired: false };
-  } catch (error: unknown) {
-    const code = (error as { code?: string }).code ?? '';
-    return { success: false, tokenExpired: EXPIRED_TOKEN_CODES.has(code) };
+    const json = (await res.json()) as { data: ExpoPushReceipt[] };
+    const receipt = json.data[0];
+    if (!receipt) return { success: false, tokenExpired: false };
+    const tokenExpired =
+      receipt.status === 'error' && receipt.details?.error === 'DeviceNotRegistered';
+    return { success: receipt.status === 'ok', tokenExpired };
+  } catch {
+    return { success: false, tokenExpired: false };
   }
 }

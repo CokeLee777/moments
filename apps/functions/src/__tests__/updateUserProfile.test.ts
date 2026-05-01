@@ -13,7 +13,7 @@ describe('runUpdateUserProfile', () => {
     uid: 'uid1',
     fcmToken: 'token123',
     topics: ['ai', 'it'] as TopicCategory[],
-    notificationHours: [8, 21],
+    notificationTimes: [8, 21],
   };
 
   it('유효한 입력으로 프로필을 저장한다', async () => {
@@ -21,7 +21,7 @@ describe('runUpdateUserProfile', () => {
     expect(mockUpsert).toHaveBeenCalledWith('uid1', {
       fcmToken: 'token123',
       topics: ['ai', 'it'],
-      notificationHours: [8, 21],
+      notificationTimes: [8, 21],
       updatedAt: expect.any(String),
     });
   });
@@ -38,16 +38,16 @@ describe('runUpdateUserProfile', () => {
     ).rejects.toThrow('Invalid topic category');
   });
 
-  it('notificationHours가 24 이상이면 에러를 던진다', async () => {
+  it('notificationTimes가 24 이상이면 에러를 던진다', async () => {
     await expect(
-      runUpdateUserProfile({ ...validInput, notificationHours: [8, 24] })
-    ).rejects.toThrow('notificationHours must be integers 0-23');
+      runUpdateUserProfile({ ...validInput, notificationTimes: [8, 24] })
+    ).rejects.toThrow('notificationTimes must be integers 0-23');
   });
 
-  it('notificationHours에 중복이 있으면 에러를 던진다', async () => {
+  it('notificationTimes에 중복이 있으면 에러를 던진다', async () => {
     await expect(
-      runUpdateUserProfile({ ...validInput, notificationHours: [8, 8] })
-    ).rejects.toThrow('notificationHours must not contain duplicates');
+      runUpdateUserProfile({ ...validInput, notificationTimes: [8, 8] })
+    ).rejects.toThrow('notificationTimes must not contain duplicates');
   });
 
   it('fcmToken이 빈 문자열이면 에러를 던진다', async () => {

@@ -8,11 +8,11 @@ interface UpdateInput {
   uid: string;
   fcmToken: string;
   topics: TopicCategory[];
-  notificationHours: number[];
+  notificationTimes: number[];
 }
 
 export async function runUpdateUserProfile(input: UpdateInput): Promise<void> {
-  const { uid, fcmToken, topics, notificationHours } = input;
+  const { uid, fcmToken, topics, notificationTimes } = input;
 
   if (!fcmToken) throw new Error('fcmToken is required');
   if (!Array.isArray(topics) || topics.length < 1 || topics.length > 2)
@@ -21,17 +21,17 @@ export async function runUpdateUserProfile(input: UpdateInput): Promise<void> {
     throw new Error('Invalid topic category');
   if (new Set(topics).size !== topics.length)
     throw new Error('topics must not contain duplicates');
-  if (!Array.isArray(notificationHours) || notificationHours.length < 1 || notificationHours.length > 2)
-    throw new Error('notificationHours must be 1-2 items');
-  if (notificationHours.some((h) => !Number.isInteger(h) || h < 0 || h > 23))
-    throw new Error('notificationHours must be integers 0-23');
-  if (new Set(notificationHours).size !== notificationHours.length)
-    throw new Error('notificationHours must not contain duplicates');
+  if (!Array.isArray(notificationTimes) || notificationTimes.length < 1 || notificationTimes.length > 2)
+    throw new Error('notificationTimes must be 1-2 items');
+  if (notificationTimes.some((h) => !Number.isInteger(h) || h < 0 || h > 23))
+    throw new Error('notificationTimes must be integers 0-23');
+  if (new Set(notificationTimes).size !== notificationTimes.length)
+    throw new Error('notificationTimes must not contain duplicates');
 
   await upsertUserProfile(uid, {
     fcmToken,
     topics,
-    notificationHours,
+    notificationTimes,
     updatedAt: new Date().toISOString(),
   });
 }

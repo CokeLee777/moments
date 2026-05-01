@@ -22,7 +22,7 @@ export async function runDispatchNotifications(deps: DispatchDeps): Promise<void
     for (const topicId of user.topics as TopicCategory[]) {
       const summary = await deps.getSummary(topicId);
       if (!summary) continue;
-      const result = await deps.sendNotification(user.fcmToken, summary);
+      const result = await deps.sendNotification(user.fcmToken!, summary);
       if (result.tokenExpired) await deps.clearToken(user.uid);
     }
   }
