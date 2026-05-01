@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import {
@@ -9,11 +10,22 @@ import { auth } from './firebase';
 
 WebBrowser.maybeCompleteAuthSession();
 
+// expo-auth-session v7 does not always auto-derive the reversed client ID on iOS.
+// Google iOS OAuth clients require redirect_uri = {reversedClientId}:/oauth2redirect/google
+function buildRedirectUri(): string | undefined {
+  const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS;
+  if (Platform.OS === 'ios' && iosClientId) {
+    const reversed = iosClientId.split('.').reverse().join('.');
+    return `${reversed}:/oauth2redirect/google`;
+  }
+  return undefined;
+}
+
 export function useGoogleAuth() {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID,
+    redirectUri: buildRedirectUri(),
   });
 
   return {

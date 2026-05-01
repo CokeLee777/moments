@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Text, View } from 'react-native';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import Svg, { Defs, RadialGradient, Stop, Ellipse } from 'react-native-svg';
 import { Slot, useRouter } from 'expo-router';
 import {
   useFonts,
@@ -13,65 +14,127 @@ import { ms, s, vs } from '../lib/scale';
 import '../global.css';
 
 function LoadingScreen() {
-  const dots = [
+  const breatheAnim = useRef(new Animated.Value(0.75)).current;
+  const dotAnims = [
     useRef(new Animated.Value(0)).current,
     useRef(new Animated.Value(0)).current,
     useRef(new Animated.Value(0)).current,
   ];
 
   useEffect(() => {
-    const anims = dots.map((dot, i) =>
-      Animated.loop(
-        Animated.sequence([
-          Animated.delay(i * 150),
-          Animated.timing(dot, {
-            toValue: vs(-5),
-            duration: 280,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(dot, {
-            toValue: 0,
-            duration: 280,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.delay((2 - i) * 150),
-        ]),
+    // "찰나" 숨쉬기 (opacity 0.75 ↔ 1)
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(breatheAnim, {
+          toValue: 1,
+          duration: 1250,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(breatheAnim, {
+          toValue: 0.75,
+          duration: 1250,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+
+    // 점 bounce + opacity
+    Animated.parallel(
+      dotAnims.map((anim, i) =>
+        Animated.loop(
+          Animated.sequence([
+            Animated.delay(i * 200),
+            Animated.timing(anim, {
+              toValue: 1,
+              duration: 280,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.timing(anim, {
+              toValue: 0,
+              duration: 280,
+              easing: Easing.inOut(Easing.ease),
+              useNativeDriver: true,
+            }),
+            Animated.delay(840 - i * 200),
+          ]),
+        ),
       ),
-    );
-    Animated.parallel(anims).start();
+    ).start();
   }, []);
 
+  const glowSize = s(220);
+  const dotSize = s(5);
+
   return (
-    <View className="flex-1 bg-brand items-center justify-center">
-      <Text
+    <View style={{ flex: 1, backgroundColor: '#060b16', alignItems: 'center', justifyContent: 'center' }}>
+      {/* Glow: SVG RadialGradient — 목업과 동일한 rgba(99,102,241,0.38) 0% → transparent 70% */}
+      <View
         style={{
-          fontFamily: 'NotoSerifKR_900Black',
-          fontSize: ms(42),
-          color: '#fff',
-          letterSpacing: -2,
-          lineHeight: ms(42),
+          position: 'absolute',
+          width: glowSize,
+          height: glowSize,
+          top: '50%',
+          left: '50%',
+          transform: [
+            { translateX: -glowSize / 2 },
+            { translateY: -(glowSize / 2 + vs(11)) },
+          ],
         }}
       >
-        찰나
-      </Text>
+        <Svg width={glowSize} height={glowSize}>
+          <Defs>
+            <RadialGradient id="glow" cx="50%" cy="50%" rx="50%" ry="50%">
+              <Stop offset="0%" stopColor="#6366f1" stopOpacity="0.38" />
+              <Stop offset="70%" stopColor="#6366f1" stopOpacity="0" />
+              <Stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+            </RadialGradient>
+          </Defs>
+          <Ellipse cx={glowSize / 2} cy={glowSize / 2} rx={glowSize / 2} ry={glowSize / 2} fill="url(#glow)" />
+        </Svg>
+      </View>
+
+      {/* 글씨 잘림 방지: Animated.View로 감싸기 */}
+      <Animated.View style={{ opacity: breatheAnim, paddingVertical: s(4) }}>
+        <Text
+          style={{
+            fontFamily: 'NotoSerifKR_900Black',
+            fontSize: ms(42),
+            color: '#fff',
+            letterSpacing: -2,
+          }}
+        >
+          찰나
+        </Text>
+      </Animated.View>
+
       <Text
-        style={{ fontSize: ms(10), color: 'rgba(255,255,255,0.35)' }}
-        className="font-medium mt-1.5 tracking-wide"
+        style={{
+          fontSize: ms(10),
+          color: 'rgba(255,255,255,0.35)',
+          fontWeight: '500',
+          marginTop: 6,
+          letterSpacing: 0.3,
+        }}
       >
         오늘의 트렌드를 한눈에
       </Text>
-      <View className="flex-row gap-1.5 mt-7">
-        {dots.map((dot, i) => (
+
+      <View style={{ flexDirection: 'row', gap: s(6), marginTop: vs(28) }}>
+        {dotAnims.map((anim, i) => (
           <Animated.View
             key={i}
             style={{
-              transform: [{ translateY: dot }],
-              width: s(5),
-              height: s(5),
-              borderRadius: s(5),
-              backgroundColor: 'rgba(255,255,255,0.35)',
+              width: dotSize,
+              height: dotSize,
+              borderRadius: dotSize / 2,
+              backgroundColor: 'rgba(255,255,255,0.5)',
+              opacity: anim.interpolate({ inputRange: [0, 1], outputRange: [0.2, 1] }),
+              transform: [
+                { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [0, -vs(4)] }) },
+              ],
             }}
           />
         ))}
@@ -91,8 +154,13 @@ export default function RootLayout() {
       if (!user) {
         setDestination('/login');
       } else {
-        const profile = await getUserProfile(user.uid);
-        setDestination(profile ? '/(tabs)' : '/onboarding');
+        try {
+          const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000));
+          const profile = await Promise.race([getUserProfile(user.uid), timeout]);
+          setDestination(profile ? '/(tabs)' : '/onboarding');
+        } catch {
+          setDestination('/onboarding');
+        }
       }
       setAuthReady(true);
     });
@@ -114,9 +182,13 @@ export default function RootLayout() {
   }, [authReady]);
 
   return (
-    <>
-      {(!authReady || !fontsLoaded) && <LoadingScreen />}
+    <View style={{ flex: 1 }}>
       <Slot />
-    </>
+      {(!authReady || !fontsLoaded) && (
+        <View style={StyleSheet.absoluteFill}>
+          <LoadingScreen />
+        </View>
+      )}
+    </View>
   );
 }

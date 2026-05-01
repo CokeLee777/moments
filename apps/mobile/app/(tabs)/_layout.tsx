@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Path, Svg } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { vs, s } from '../../lib/scale';
 
 function HomeIcon({ color, filled }: { color: string; filled: boolean }) {
@@ -41,13 +42,16 @@ function PersonIcon({ color, filled }: { color: string; filled: boolean }) {
 }
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          height: vs(40),
+          height: vs(40) + insets.bottom,
+          paddingBottom: insets.bottom,
           borderTopWidth: 1,
           borderTopColor: '#f1f5f9',
           backgroundColor: '#fff',

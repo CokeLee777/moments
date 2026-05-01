@@ -100,13 +100,13 @@ export default function NotificationsScreen() {
         ) : (
           groups.map((group) => (
             <View key={group.label}>
-              <Text className="text-[8px] font-bold text-muted uppercase tracking-wider px-0.5 py-1">
+              <Text style={{ fontSize: 8, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.6, textTransform: 'uppercase', paddingTop: 4, paddingBottom: 2, paddingHorizontal: 2 }}>
                 {group.label}
               </Text>
               {group.items.map((item) => (
                 <View
                   key={item.id}
-                  className="bg-white rounded-2xl px-3 py-2.5 flex-row gap-2.5 border border-black/5 mb-1.5"
+                  style={{ backgroundColor: '#fff', borderRadius: 16, paddingVertical: 9, paddingHorizontal: 11, flexDirection: 'row', gap: 9, alignItems: 'flex-start', borderWidth: 1, borderColor: 'rgba(0,0,0,0.045)', marginBottom: 6 }}
                 >
                   <View
                     className="w-7 h-7 rounded-[10px] items-center justify-center"
@@ -117,13 +117,13 @@ export default function NotificationsScreen() {
                     </Text>
                   </View>
                   <View className="flex-1">
-                    <Text className="text-[9.5px] font-bold text-slate-800 leading-snug">
+                    <Text style={{ fontSize: 9.5, fontWeight: '700', color: '#1e293b', lineHeight: 9.5 * 1.3 }}>
                       {item.title}
                     </Text>
-                    <Text className="text-[8.5px] text-slate-500 leading-relaxed mt-0.5">
+                    <Text style={{ fontSize: 8.5, color: '#64748b', lineHeight: 8.5 * 1.5, marginTop: 2 }}>
                       {item.body}
                     </Text>
-                    <Text className="text-[7.5px] text-muted mt-1 font-medium">
+                    <Text style={{ fontSize: 7.5, color: '#94a3b8', marginTop: 3, fontWeight: '500' }}>
                       {formatTime(item.receivedAt)}
                     </Text>
                   </View>

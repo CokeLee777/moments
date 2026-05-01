@@ -22,11 +22,14 @@ export async function registerForPushNotifications(): Promise<void> {
 
   if (status !== 'granted') return;
 
-  const { data: token } = await Notifications.getExpoPushTokenAsync();
-
-  const user = auth.currentUser;
-  if (user) {
-    await updateDoc(doc(db, 'users', user.uid), { fcmToken: token });
+  try {
+    const { data: token } = await Notifications.getExpoPushTokenAsync();
+    const user = auth.currentUser;
+    if (user) {
+      await updateDoc(doc(db, 'users', user.uid), { fcmToken: token });
+    }
+  } catch {
+    // Expo Go / 시뮬레이터에서는 aps-environment 인타이틀먼트 없이 FCM 토큰 발급 불가
   }
 }
 

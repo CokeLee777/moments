@@ -15,7 +15,7 @@ const TOPIC_LABELS: Record<string, string> = {
 };
 
 function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+  return new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
 }
 
 function formatDateKo(): string {
@@ -50,18 +50,13 @@ export default function HomeScreen() {
       {/* 헤더 */}
       <View className="bg-white px-4 pt-1.5 pb-2.5 flex-row items-center justify-between border-b border-slate-100">
         <Text
-          style={{
-            fontFamily: 'NotoSerifKR_900Black',
-            fontSize: 19,
-            color: '#0f172a',
-            letterSpacing: -0.8,
-            lineHeight: 19,
-          }}
+          className="font-black text-slate-900"
+          style={{ fontSize: 19, letterSpacing: -0.8 }}
         >
           찰나
         </Text>
-        <View className="bg-slate-100 rounded-[10px] px-2.5 py-0.5">
-          <Text className="text-[8.5px] font-bold text-slate-500">
+        <View style={{ backgroundColor: '#f1f5f9', borderRadius: 10, paddingHorizontal: 9, paddingVertical: 3 }}>
+          <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#64748b', letterSpacing: -0.1 }}>
             {formatDateKo()}
           </Text>
         </View>
@@ -74,7 +69,7 @@ export default function HomeScreen() {
             <TouchableOpacity
               key={topicId}
               onPress={() => setActiveIdx(idx)}
-              className="flex-1 py-2 items-center"
+              className="flex-1 pt-2 pb-[7px] items-center"
             >
               <Text
                 className={`text-[11px] font-semibold ${
@@ -99,10 +94,10 @@ export default function HomeScreen() {
         {summary ? (
           <>
             <TrendCard summary={summary} />
-            <Text className="text-[8.5px] font-bold text-muted uppercase tracking-wider px-2.5 pb-1.5">
+            <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingHorizontal: 10, paddingBottom: 5 }}>
               관련 뉴스
             </Text>
-            <View className="px-2.5 gap-1">
+            <View style={{ paddingHorizontal: 10, gap: 4 }}>
               {summary.articles.map((article, i) => (
                 <NewsItem key={i} article={article} />
               ))}

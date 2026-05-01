@@ -42,9 +42,9 @@ export default function SettingsScreen() {
         </Text>
       </View>
 
-      <View className="flex-1 bg-surface p-2.5 gap-2">
+      <View className="flex-1 bg-surface p-2.5" style={{ gap: 7 }}>
         {/* 프로필 카드 */}
-        <View className="bg-white rounded-2xl p-3 flex-row items-center gap-2.5 border border-black/5">
+        <View style={{ backgroundColor: '#fff', borderRadius: 20, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)' }}>
           {user?.photoURL ? (
             <Image
               source={{ uri: user.photoURL }}
@@ -66,16 +66,16 @@ export default function SettingsScreen() {
             <Text className="text-[11px] font-bold text-slate-900">
               {user?.displayName}
             </Text>
-            <Text className="text-[8.5px] text-muted mt-0.5">{user?.email}</Text>
+            <Text style={{ fontSize: 8.5, color: '#94a3b8', marginTop: 1 }}>{user?.email}</Text>
           </View>
         </View>
 
         {/* 구독 섹션 */}
-        <Text className="text-[8.5px] font-bold text-muted uppercase tracking-wider px-0.5 pt-1">
+        <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingTop: 2, paddingHorizontal: 2 }}>
           구독
         </Text>
-        <View className="bg-white rounded-[18px] px-3 py-2.5 border border-black/5">
-          <View className="flex-row items-center justify-between mb-1.5">
+        <View style={{ backgroundColor: '#fff', borderRadius: 18, paddingHorizontal: 12, paddingVertical: 11, borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)' }}>
+          <View className="flex-row items-center justify-between" style={{ marginBottom: 7 }}>
             <Text className="text-[10px] font-semibold text-slate-800">관심 주제</Text>
             <Pressable onPress={() => router.push('/onboarding?mode=topics' as never)}>
               <Text className="text-[8.5px] font-bold text-primary">변경</Text>
@@ -83,8 +83,8 @@ export default function SettingsScreen() {
           </View>
           <View className="flex-row gap-1.5 flex-wrap">
             {profile?.topics?.map((t) => (
-              <View key={t} className="bg-blue-50 rounded-full px-2.5 py-1">
-                <Text className="text-[8.5px] font-semibold text-primary">
+              <View key={t} style={{ backgroundColor: '#eff6ff', borderRadius: 20, paddingHorizontal: 9, paddingVertical: 3 }}>
+                <Text style={{ fontSize: 8.5, fontWeight: '600', color: '#3b82f6' }}>
                   {TOPIC_LABELS[t] ?? t}
                 </Text>
               </View>
@@ -93,11 +93,11 @@ export default function SettingsScreen() {
         </View>
 
         {/* 알림 섹션 */}
-        <Text className="text-[8.5px] font-bold text-muted uppercase tracking-wider px-0.5 pt-1">
+        <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingTop: 2, paddingHorizontal: 2 }}>
           알림
         </Text>
-        <View className="bg-white rounded-[18px] px-3 py-2.5 border border-black/5">
-          <View className="flex-row items-center justify-between mb-1.5">
+        <View style={{ backgroundColor: '#fff', borderRadius: 18, paddingHorizontal: 12, paddingVertical: 11, borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)' }}>
+          <View className="flex-row items-center justify-between" style={{ marginBottom: 7 }}>
             <Text className="text-[10px] font-semibold text-slate-800">알림 시간</Text>
             <Pressable onPress={() => router.push('/onboarding?mode=times' as never)}>
               <Text className="text-[8.5px] font-bold text-primary">변경</Text>
@@ -105,8 +105,8 @@ export default function SettingsScreen() {
           </View>
           <View className="flex-row gap-1.5 flex-wrap">
             {profile?.notificationTimes?.map((h) => (
-              <View key={h} className="bg-blue-50 rounded-full px-2.5 py-1">
-                <Text className="text-[8.5px] font-semibold text-primary">
+              <View key={h} style={{ backgroundColor: '#eff6ff', borderRadius: 20, paddingHorizontal: 9, paddingVertical: 3 }}>
+                <Text style={{ fontSize: 8.5, fontWeight: '600', color: '#3b82f6' }}>
                   {formatHour(h)}
                 </Text>
               </View>
@@ -117,8 +117,7 @@ export default function SettingsScreen() {
         {/* 로그아웃 */}
         <Pressable
           onPress={handleSignOut}
-          className="bg-white rounded-[18px] py-3 items-center border mt-1"
-          style={{ borderColor: 'rgba(239,68,68,0.12)' }}
+          style={{ backgroundColor: '#fff', borderRadius: 18, paddingVertical: 11, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(239,68,68,0.12)', marginTop: 4 }}
         >
           <Text className="text-red-500 font-bold text-[11px]">로그아웃</Text>
         </Pressable>

@@ -1,16 +1,8 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import type { TrendSummary } from '@moments/shared';
+import type { TrendSummary, UserProfile } from '@moments/shared';
 import { db } from './firebase';
 
-export interface UserProfile {
-  uid: string;
-  displayName: string;
-  email: string;
-  photoURL: string | null;
-  topics: string[];
-  notificationTimes: number[];
-  fcmToken?: string;
-}
+export type { UserProfile };
 
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   const snap = await getDoc(doc(db, 'users', uid));
@@ -19,7 +11,7 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
 
 export async function updateUserProfile(
   uid: string,
-  data: Partial<Omit<UserProfile, 'uid'>>,
+  data: Partial<UserProfile>,
 ): Promise<void> {
   await setDoc(doc(db, 'users', uid), { uid, ...data }, { merge: true });
 }

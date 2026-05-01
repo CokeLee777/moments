@@ -1,48 +1,116 @@
-import { useEffect } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { Svg, Path } from 'react-native-svg';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useState } from 'react';
+import { Dimensions, Pressable, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Defs, Ellipse, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useGoogleAuth, handleGoogleResponse } from '../lib/auth';
+
+const { width: SCREEN_W } = Dimensions.get('window');
+// 카드 프리뷰 너비: hero px-5(20px) 양쪽 = SCREEN_W - 40
+const CARD_W = SCREEN_W - 40;
 
 export default function LoginScreen() {
   const { request, response, signIn } = useGoogleAuth();
+  const [cardH, setCardH] = useState(CARD_W * 0.38);
 
   useEffect(() => {
     handleGoogleResponse(response);
   }, [response]);
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       {/* Hero */}
-      <View className="flex-1 items-center justify-center px-5">
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20, position: 'relative' }}>
+
+        {/* Hero glow — radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%) */}
+        <View style={{ position: 'absolute', top: '45%', left: '50%', width: 200, height: 200, transform: [{ translateX: -100 }, { translateY: -100 }] }} pointerEvents="none">
+          <Svg width={200} height={200}>
+            <Defs>
+              <RadialGradient id="heroGlow" cx="50%" cy="50%" r="50%">
+                <Stop offset="0%" stopColor="#3b82f6" stopOpacity="0.07" />
+                <Stop offset="70%" stopColor="#3b82f6" stopOpacity="0" />
+                <Stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+              </RadialGradient>
+            </Defs>
+            <Ellipse cx={100} cy={100} rx={100} ry={100} fill="url(#heroGlow)" />
+          </Svg>
+        </View>
+
+        {/* 찰나 로고 — lineHeight 제거로 clipping 방지 */}
         <Text
           style={{
             fontFamily: 'NotoSerifKR_900Black',
             fontSize: 48,
             color: '#0f172a',
             letterSpacing: -2.5,
-            lineHeight: 48,
           }}
         >
           찰나
         </Text>
-        <Text className="text-slate-500 text-[11px] font-medium mt-2 text-center leading-relaxed">
-          AI가 매일 정리하는{'\n'}트렌드 뉴스 브리핑
+
+        {/* 태그라인 */}
+        <Text
+          style={{
+            fontSize: 11,
+            color: '#64748b',
+            fontWeight: '500',
+            marginTop: 8,
+            textAlign: 'center',
+            lineHeight: 11 * 1.6,
+          }}
+        >
+          {'AI가 매일 정리하는\n트렌드 뉴스 브리핑'}
         </Text>
 
-        {/* AI 카드 프리뷰 */}
-        <View className="mt-6 w-full rounded-2xl overflow-hidden">
-          <LinearGradient
-            colors={['rgba(99,102,241,0.5)', 'transparent']}
-            start={{ x: 0.8, y: 0.2 }}
-            end={{ x: 0, y: 1 }}
-            style={{ position: 'absolute', inset: 0 }}
-          />
-          <View className="bg-navy p-3.5 rounded-2xl">
-            <Text className="text-white text-[10.5px] font-extrabold mb-1 tracking-tight">
+        {/* 카드 프리뷰 */}
+        <View
+          style={{
+            marginTop: 22,
+            width: '100%',
+            backgroundColor: '#0b1120',
+            borderRadius: 20,
+            overflow: 'hidden',
+          }}
+          onLayout={e => setCardH(e.nativeEvent.layout.height)}
+        >
+          {/* 배경 radial-gradient(ellipse at 80% 20%, rgba(99,102,241,0.5) 0%, transparent 60%) */}
+          <Svg style={{ position: 'absolute', top: 0, left: 0 }} width={CARD_W} height={cardH}>
+            <Defs>
+              <RadialGradient
+                id="cardGlow"
+                cx={CARD_W * 0.8}
+                cy={cardH * 0.2}
+                r={CARD_W * 0.7}
+                gradientUnits="userSpaceOnUse"
+              >
+                <Stop offset="0%" stopColor="#6366f1" stopOpacity="0.5" />
+                <Stop offset="60%" stopColor="#6366f1" stopOpacity="0" />
+                <Stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+              </RadialGradient>
+            </Defs>
+            <Rect width={CARD_W} height={cardH} fill="url(#cardGlow)" />
+          </Svg>
+
+          <View style={{ padding: 13 }}>
+            <Text
+              style={{
+                fontSize: 10.5,
+                fontWeight: '800',
+                color: '#fff',
+                lineHeight: 10.5 * 1.3,
+                marginBottom: 4,
+                letterSpacing: -0.2,
+              }}
+            >
               오늘의 AI 트렌드
             </Text>
-            <Text className="text-white/50 text-[8px] leading-relaxed font-medium">
+            <Text
+              style={{
+                fontSize: 8,
+                color: 'rgba(255,255,255,0.5)',
+                fontWeight: '500',
+                lineHeight: 8 * 1.6,
+              }}
+            >
               GPT-5 출시 소문과 함께 국내 AI 스타트업 투자가 급증. 삼성·LG도 자체 LLM 개발에 박차를 가하고 있습니다.
             </Text>
           </View>
@@ -50,20 +118,47 @@ export default function LoginScreen() {
       </View>
 
       {/* Footer */}
-      <View className="px-4 pb-8">
+      <View style={{ paddingHorizontal: 16, paddingBottom: 24 }}>
         <Pressable
           onPress={() => signIn()}
           disabled={!request}
-          className="w-full py-3 border border-black/10 rounded-[18px] flex-row items-center justify-center gap-2.5 bg-white shadow-sm active:opacity-80"
+          style={{
+            width: '100%',
+            paddingVertical: 11,
+            paddingHorizontal: 16,
+            backgroundColor: '#fff',
+            borderWidth: 1,
+            borderColor: 'rgba(0,0,0,0.08)',
+            borderRadius: 18,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 9,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.06,
+            shadowRadius: 4,
+            elevation: 1,
+          }}
         >
           <GoogleLogo />
-          <Text className="text-slate-800 font-bold text-[11px]">Google로 시작하기</Text>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: '#1e293b' }}>
+            Google로 시작하기
+          </Text>
         </Pressable>
-        <Text className="text-slate-400 text-[7.5px] text-center mt-2 leading-relaxed">
+        <Text
+          style={{
+            fontSize: 7.5,
+            color: '#94a3b8',
+            textAlign: 'center',
+            marginTop: 8,
+            lineHeight: 7.5 * 1.5,
+          }}
+        >
           계속하면 서비스 이용약관 및 개인정보처리방침에 동의하게 됩니다.
         </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -72,7 +167,7 @@ function GoogleLogo() {
     <Svg width={15} height={15} viewBox="0 0 24 24">
       <Path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
       <Path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-      <Path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+      <Path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
       <Path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
     </Svg>
   );

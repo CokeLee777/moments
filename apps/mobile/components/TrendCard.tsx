@@ -1,5 +1,6 @@
-import { Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Easing, Text, View } from 'react-native';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import type { TrendSummary } from '@moments/shared';
 import { ms } from '../lib/scale';
 
@@ -7,44 +8,112 @@ interface Props {
   summary: TrendSummary;
 }
 
-export function TrendCard({ summary }: Props) {
-  return (
-    <View className="mx-2.5 mb-2.5 rounded-[20px] overflow-hidden">
-      <View className="bg-navy p-3.5 rounded-[20px]">
-        {/* 배경 그라데이션 — top-right indigo */}
-        <LinearGradient
-          colors={['rgba(99,102,241,0.55)', 'transparent']}
-          start={{ x: 0.85, y: 0.15 }}
-          end={{ x: 0, y: 1 }}
-          style={{ position: 'absolute', inset: 0, borderRadius: 20 }}
-        />
-        {/* 배경 그라데이션 — bottom-left blue */}
-        <LinearGradient
-          colors={['rgba(59,130,246,0.4)', 'transparent']}
-          start={{ x: 0.05, y: 0.85 }}
-          end={{ x: 1, y: 0 }}
-          style={{ position: 'absolute', inset: 0, borderRadius: 20 }}
-        />
+const { width: SCREEN_W } = Dimensions.get('window');
 
+export function TrendCard({ summary }: Props) {
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  // 초기값을 Dimensions 기반으로 설정해 첫 렌더에서도 그라데이션이 보이도록
+  const [cardSize, setCardSize] = useState({ w: SCREEN_W - 20, h: (SCREEN_W - 20) * 0.42 });
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 0.3,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+  }, []);
+
+  return (
+    <View
+      className="mx-[10px] mb-[9px] rounded-[20px] overflow-hidden bg-navy"
+      onLayout={e => {
+        const { width, height } = e.nativeEvent.layout;
+        setCardSize({ w: width, h: height });
+      }}
+    >
+      {/* 배경: SVG radial-gradient(ellipse at 85% 15%, indigo 0%, transparent 55%) + (ellipse at 5% 85%, blue 0%, transparent 50%) */}
+      <Svg
+        style={{ position: 'absolute', top: 0, left: 0 }}
+        width={cardSize.w}
+        height={cardSize.h}
+      >
+        <Defs>
+          <RadialGradient
+            id="trendG1"
+            cx={cardSize.w * 0.85}
+            cy={cardSize.h * 0.15}
+            r={cardSize.w * 0.7}
+            gradientUnits="userSpaceOnUse"
+          >
+            <Stop offset="0%" stopColor="#6366f1" stopOpacity="0.55" />
+            <Stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+          </RadialGradient>
+          <RadialGradient
+            id="trendG2"
+            cx={cardSize.w * 0.05}
+            cy={cardSize.h * 0.85}
+            r={cardSize.w * 0.65}
+            gradientUnits="userSpaceOnUse"
+          >
+            <Stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
+            <Stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+          </RadialGradient>
+        </Defs>
+        <Rect width={cardSize.w} height={cardSize.h} fill="url(#trendG1)" />
+        <Rect width={cardSize.w} height={cardSize.h} fill="url(#trendG2)" />
+      </Svg>
+
+      <View style={{ padding: 13 }}>
         {/* AI 요약 배지 */}
         <View
-          className="flex-row items-center self-start rounded-full px-2 py-0.5 mb-2 gap-1"
+          className="flex-row items-center self-start rounded-full gap-1"
           style={{
             backgroundColor: 'rgba(255,255,255,0.1)',
             borderWidth: 1,
             borderColor: 'rgba(255,255,255,0.14)',
+            paddingLeft: 6,
+            paddingRight: 8,
+            paddingVertical: 2,
+            marginBottom: 7,
           }}
         >
-          <View className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-          <Text className="text-white/80 text-[7.5px] font-extrabold uppercase tracking-widest">
+          <Animated.View
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: 3,
+              backgroundColor: '#60a5fa',
+              opacity: pulseAnim,
+            }}
+          />
+          <Text
+            style={{
+              fontSize: 7.5,
+              fontWeight: '800',
+              color: 'rgba(255,255,255,0.8)',
+              letterSpacing: 0.8,
+              textTransform: 'uppercase',
+            }}
+          >
             AI 요약
           </Text>
         </View>
 
         {/* 제목 */}
         <Text
-          className="text-white font-extrabold leading-snug mb-1.5"
-          style={{ fontSize: ms(12.5), letterSpacing: -0.3 }}
+          className="text-white font-extrabold"
+          style={{ fontSize: ms(12.5), letterSpacing: -0.3, lineHeight: ms(12.5) * 1.3, marginBottom: 5 }}
         >
           {summary.title}
         </Text>
@@ -52,7 +121,7 @@ export function TrendCard({ summary }: Props) {
         {/* 요약 본문 */}
         <Text
           numberOfLines={5}
-          className="text-[9px] leading-relaxed text-white/70"
+          style={{ fontSize: 9, color: 'rgba(255,255,255,0.68)', lineHeight: 9 * 1.65 }}
         >
           {summary.summary}
         </Text>

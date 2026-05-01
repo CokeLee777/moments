@@ -1,4 +1,5 @@
 import { Pressable, Text } from 'react-native';
+import { ms } from '../lib/scale';
 
 export const TOPIC_ICONS: Record<string, string> = {
   it: '🖥️',
@@ -24,7 +25,7 @@ export function TopicCard({ topicId, selected, onPress }: Props) {
   return (
     <Pressable
       onPress={onPress}
-      className={`rounded-[18px] border p-3.5 items-center gap-1.5 ${
+      className={`rounded-[18px] border py-3.5 px-2.5 items-center gap-1.5 ${
         selected
           ? 'bg-blue-50 border-blue-300'
           : 'bg-white border-black/5'
@@ -34,9 +35,7 @@ export function TopicCard({ topicId, selected, onPress }: Props) {
         {TOPIC_ICONS[topicId] ?? '📌'}
       </Text>
       <Text
-        className={`text-[9.5px] font-bold text-center ${
-          selected ? 'text-primary' : 'text-slate-500'
-        }`}
+        style={{ fontSize: 9.5, fontWeight: '700', textAlign: 'center', color: selected ? '#3b82f6' : '#475569' }}
       >
         {TOPIC_LABELS[topicId] ?? topicId}
       </Text>

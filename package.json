@@ -2,16 +2,20 @@
   "name": "moments",
   "version": "0.0.0",
   "private": true,
-  "engines": { "node": ">=20.19.0" },
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "dev:mobile": "pnpm --filter @moments/mobile start",
-    "dev:functions": "pnpm --filter @moments/functions dev"
+    "dev:functions": "pnpm --filter @moments/functions dev",
+    "dev": "pnpm --filter @moments/shared build && concurrently --names \"functions,emulator,mobile\" --prefix-colors \"cyan,yellow,green\" \"pnpm dev:functions\" \"firebase emulators:start\" \"pnpm dev:mobile\""
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "concurrently": "^9.2.1",
     "eslint": "^10.2.1",
     "prettier": "^3.8.3",
     "turbo": "^2.9.6",
