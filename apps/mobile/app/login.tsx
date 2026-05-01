@@ -10,17 +10,13 @@ const CARD_W = SCREEN_W - 40;
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [cardH, setCardH] = useState(CARD_W * 0.38);
 
   async function handleSignIn() {
     setLoading(true);
-    setError(null);
     try {
       await signInWithGoogle();
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? `${e.message}\n${(e as { code?: string }).code ?? ''}` : String(e);
-      setError(msg);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -167,11 +163,7 @@ export default function LoginScreen() {
         >
           계속하면 서비스 이용약관 및 개인정보처리방침에 동의하게 됩니다.
         </Text>
-        {error && (
-          <Text style={{ fontSize: 10, color: 'red', textAlign: 'center', marginTop: 8 }}>
-            {error}
-          </Text>
-        )}
+
       </View>
     </SafeAreaView>
   );
