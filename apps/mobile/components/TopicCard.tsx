@@ -1,5 +1,4 @@
 import { Pressable, Text } from 'react-native';
-import { ms } from '../lib/scale';
 
 export const TOPIC_ICONS: Record<string, string> = {
   it: '🖥️',

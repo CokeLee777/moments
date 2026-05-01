@@ -1,5 +1,4 @@
 import { Pressable, Text } from 'react-native';
-import { ms } from '../lib/scale';
 
 export function formatHour(hour: number): string {
   if (hour === 0) return '오전 12시';

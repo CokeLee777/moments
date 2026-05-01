@@ -7,7 +7,6 @@ import { auth } from '../lib/firebase';
 import { getUserProfile, updateUserProfile } from '../lib/firestore';
 import { TopicCard } from '../components/TopicCard';
 import { TimeSlot } from '../components/TimeSlot';
-import { ms } from '../lib/scale';
 import type { TopicCategory } from '@moments/shared';
 
 const ALL_TOPICS: TopicCategory[] = ['it', 'ai', 'fashion', 'automotive'];
@@ -60,13 +59,13 @@ export default function OnboardingScreen() {
     if (!user) return;
 
     if (mode === 'topics') {
-      try { await updateUserProfile(user.uid, { topics: selectedTopics }); } catch {}
+      try { await updateUserProfile(user.uid, { topics: selectedTopics }); } catch { /* ignore */ }
       router.replace('/(tabs)/settings' as never);
       return;
     }
 
     if (mode === 'times') {
-      try { await updateUserProfile(user.uid, { notificationTimes: selectedTimes }); } catch {}
+      try { await updateUserProfile(user.uid, { notificationTimes: selectedTimes }); } catch { /* ignore */ }
       router.replace('/(tabs)/settings' as never);
       return;
     }
@@ -84,7 +83,7 @@ export default function OnboardingScreen() {
         topics: selectedTopics,
         notificationTimes: selectedTimes,
       });
-    } catch {}
+    } catch { /* ignore */ }
     router.replace('/(tabs)');
   }
 
