@@ -1,20 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, Ellipse, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
-import { useGoogleAuth, handleGoogleResponse } from '../lib/auth';
+import { signInWithGoogle } from '../lib/auth';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 // 카드 프리뷰 너비: hero px-5(20px) 양쪽 = SCREEN_W - 40
 const CARD_W = SCREEN_W - 40;
 
 export default function LoginScreen() {
-  const { request, response, signIn } = useGoogleAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [cardH, setCardH] = useState(CARD_W * 0.38);
 
-  useEffect(() => {
-    handleGoogleResponse(response);
-  }, [response]);
+  async function handleSignIn() {
+    setLoading(true);
+    setError(null);
+    try {
+      await signInWithGoogle();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? `${e.message}\n${(e as { code?: string }).code ?? ''}` : String(e);
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -120,8 +130,8 @@ export default function LoginScreen() {
       {/* Footer */}
       <View style={{ paddingHorizontal: 16, paddingBottom: 24 }}>
         <Pressable
-          onPress={() => signIn()}
-          disabled={!request}
+          onPress={handleSignIn}
+          disabled={loading}
           style={{
             width: '100%',
             paddingVertical: 11,
@@ -157,6 +167,11 @@ export default function LoginScreen() {
         >
           계속하면 서비스 이용약관 및 개인정보처리방침에 동의하게 됩니다.
         </Text>
+        {error && (
+          <Text style={{ fontSize: 10, color: 'red', textAlign: 'center', marginTop: 8 }}>
+            {error}
+          </Text>
+        )}
       </View>
     </SafeAreaView>
   );
