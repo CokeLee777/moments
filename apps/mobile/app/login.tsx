@@ -17,6 +17,7 @@ export default function LoginScreen() {
     try {
       await signInWithGoogle();
     } catch {
+      // sign-in errors are handled inside signInWithGoogle
     } finally {
       setLoading(false);
     }
