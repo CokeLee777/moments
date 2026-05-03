@@ -1,0 +1,13 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "trendSummaries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "topicId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

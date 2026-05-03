@@ -26,7 +26,7 @@ const TOPIC_TITLES: Record<TopicCategory, string> = {
 interface CollectDeps {
   fetchNews: typeof fetchNaverNews;
   summarize: typeof summarizeArticles;
-  save: (doc: TrendSummary) => Promise<void>;
+  save: (doc: Omit<TrendSummary, 'id'>) => Promise<void>;
   clientId: string;
   clientSecret: string;
   apiKey: string;
@@ -39,7 +39,6 @@ export async function runCollectTrends(deps: CollectDeps): Promise<void> {
     const articles = naverArticles.map(toArticle);
     const summary = await deps.summarize(topicId, naverArticles, deps.apiKey);
     await deps.save({
-      id: '',
       topicId,
       title: TOPIC_TITLES[topicId],
       summary,

@@ -1,25 +1,20 @@
 import { db } from './admin.js';
 import type { TrendSummary, UserProfile, TopicCategory, UserNotification } from '@moments/shared';
 
-function getKstDateString(offsetDays = 0): string {
-  const now = new Date();
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000 + offsetDays * 24 * 60 * 60 * 1000);
-  return kst.toISOString().slice(0, 10);
-}
-
-export async function saveTrendSummary(doc: TrendSummary): Promise<void> {
-  const date = getKstDateString();
-  const id = `${doc.topicId}_${date}`;
-  await db.collection('trendSummaries').doc(id).set({ ...doc, id });
+export async function saveTrendSummary(doc: Omit<TrendSummary, 'id'>): Promise<void> {
+  const ref = db.collection('trendSummaries').doc();
+  await ref.set({ ...doc, id: ref.id });
 }
 
 export async function getLatestTrendSummary(topicId: TopicCategory): Promise<TrendSummary | null> {
-  for (const offsetDays of [0, -1]) {
-    const date = getKstDateString(offsetDays);
-    const snap = await db.collection('trendSummaries').doc(`${topicId}_${date}`).get();
-    if (snap.exists) return snap.data() as TrendSummary;
-  }
-  return null;
+  const snap = await db
+    .collection('trendSummaries')
+    .where('topicId', '==', topicId)
+    .orderBy('createdAt', 'desc')
+    .limit(1)
+    .get();
+  if (snap.empty) return null;
+  return snap.docs[0].data() as TrendSummary;
 }
 
 export async function getUsersWithNotificationHour(

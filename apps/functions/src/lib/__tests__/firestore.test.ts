@@ -9,8 +9,12 @@ import {
 const mockSet = jest.fn().mockResolvedValue(undefined);
 const mockUpdate = jest.fn().mockResolvedValue(undefined);
 const mockGet = jest.fn();
-const mockDoc = jest.fn().mockReturnValue({ set: mockSet, update: mockUpdate, get: mockGet });
-const mockWhere = jest.fn();
+const mockLimit = jest.fn().mockReturnValue({ get: mockGet });
+const mockOrderBy = jest.fn().mockReturnValue({ limit: mockLimit });
+const mockWhereResult = { get: mockGet, orderBy: mockOrderBy };
+const mockWhere = jest.fn().mockReturnValue(mockWhereResult);
+const mockDocRef = { set: mockSet, update: mockUpdate, get: mockGet, id: 'mock-auto-id' };
+const mockDoc = jest.fn().mockReturnValue(mockDocRef);
 const mockCollection = jest.fn().mockReturnValue({ doc: mockDoc, where: mockWhere });
 
 jest.mock('../admin.js', () => ({
@@ -20,7 +24,7 @@ jest.mock('../admin.js', () => ({
 }));
 
 const mockTrendSummary = {
-  id: '',
+  id: 'mock-auto-id',
   topicId: 'ai' as const,
   title: '오늘의 AI 트렌드',
   summary: '요약 내용',
@@ -30,31 +34,27 @@ const mockTrendSummary = {
 };
 
 describe('saveTrendSummary', () => {
-  it('trendSummaries/{topicId}_{date} 문서에 저장한다', async () => {
-    await saveTrendSummary(mockTrendSummary);
+  it('trendSummaries 컬렉션에 auto-generated ID로 저장한다', async () => {
+    const { id: _id, ...docWithoutId } = mockTrendSummary;
+    await saveTrendSummary(docWithoutId);
     expect(mockCollection).toHaveBeenCalledWith('trendSummaries');
-    expect(mockDoc).toHaveBeenCalledWith(expect.stringMatching(/^ai_\d{4}-\d{2}-\d{2}$/));
-    expect(mockSet).toHaveBeenCalledWith(expect.objectContaining({ topicId: 'ai' }));
+    expect(mockDoc).toHaveBeenCalledWith();
+    expect(mockSet).toHaveBeenCalledWith(expect.objectContaining({ topicId: 'ai', id: 'mock-auto-id' }));
   });
 });
 
 describe('getLatestTrendSummary', () => {
-  it('오늘 문서가 있으면 반환한다', async () => {
-    mockGet.mockResolvedValueOnce({ exists: true, data: () => mockTrendSummary });
+  it('topicId로 쿼리해 가장 최신 문서를 반환한다', async () => {
+    mockGet.mockResolvedValueOnce({ empty: false, docs: [{ data: () => mockTrendSummary }] });
     const result = await getLatestTrendSummary('ai');
     expect(result).toEqual(mockTrendSummary);
+    expect(mockWhere).toHaveBeenCalledWith('topicId', '==', 'ai');
+    expect(mockOrderBy).toHaveBeenCalledWith('createdAt', 'desc');
+    expect(mockLimit).toHaveBeenCalledWith(1);
   });
 
-  it('오늘 문서가 없으면 어제 문서를 시도한다', async () => {
-    mockGet
-      .mockResolvedValueOnce({ exists: false })
-      .mockResolvedValueOnce({ exists: true, data: () => ({ ...mockTrendSummary, id: 'ai_yesterday' }) });
-    const result = await getLatestTrendSummary('ai');
-    expect(result?.id).toBe('ai_yesterday');
-  });
-
-  it('오늘·어제 모두 없으면 null 반환', async () => {
-    mockGet.mockResolvedValue({ exists: false });
+  it('결과가 없으면 null을 반환한다', async () => {
+    mockGet.mockResolvedValueOnce({ empty: true, docs: [] });
     const result = await getLatestTrendSummary('ai');
     expect(result).toBeNull();
   });

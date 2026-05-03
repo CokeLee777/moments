@@ -1,7 +1,7 @@
 import { runDispatchNotifications } from '../dispatchNotifications.js';
 
 const mockSummary = {
-  id: 'ai_2026-04-27',
+  id: 'abc123autoId',
   topicId: 'ai',
   title: '오늘의 AI 트렌드',
   summary: '요약입니다.',
