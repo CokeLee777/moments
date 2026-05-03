@@ -1,7 +1,10 @@
+import { View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Path, Svg } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { vs, s } from '../../lib/scale';
+import { BANNER_AD_UNIT_ID } from '../../lib/adUnits';
 
 function HomeIcon({ color, filled }: { color: string; filled: boolean }) {
   return (
@@ -45,33 +48,39 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          height: vs(40) + insets.bottom,
-          paddingBottom: insets.bottom,
-          borderTopWidth: 1,
-          borderTopColor: '#f1f5f9',
-          backgroundColor: '#fff',
-        },
-        tabBarActiveTintColor: '#3b82f6',
-        tabBarInactiveTintColor: '#94a3b8',
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{ tabBarIcon: ({ color, focused }) => <HomeIcon color={color} filled={focused} /> }}
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarShowLabel: false,
+          tabBarStyle: {
+            height: vs(40) + insets.bottom,
+            paddingBottom: insets.bottom,
+            borderTopWidth: 1,
+            borderTopColor: '#f1f5f9',
+            backgroundColor: '#fff',
+          },
+          tabBarActiveTintColor: '#3b82f6',
+          tabBarInactiveTintColor: '#94a3b8',
+        }}
+      >
+        <Tabs.Screen
+          name="index"
+          options={{ tabBarIcon: ({ color, focused }) => <HomeIcon color={color} filled={focused} /> }}
+        />
+        <Tabs.Screen
+          name="notifications"
+          options={{ tabBarIcon: ({ color, focused }) => <BellIcon color={color} filled={focused} /> }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{ tabBarIcon: ({ color, focused }) => <PersonIcon color={color} filled={focused} /> }}
+        />
+      </Tabs>
+      <BannerAd
+        unitId={BANNER_AD_UNIT_ID}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
       />
-      <Tabs.Screen
-        name="notifications"
-        options={{ tabBarIcon: ({ color, focused }) => <BellIcon color={color} filled={focused} /> }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{ tabBarIcon: ({ color, focused }) => <PersonIcon color={color} filled={focused} /> }}
-      />
-    </Tabs>
+    </View>
   );
 }
