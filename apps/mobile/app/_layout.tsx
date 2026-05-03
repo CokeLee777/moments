@@ -150,7 +150,7 @@ export default function RootLayout() {
   const router = useRouter();
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
+    return onAuthStateChanged(auth, async (user) => {
       if (!user) {
         setDestination('/login');
       } else {
@@ -164,7 +164,6 @@ export default function RootLayout() {
       }
       setAuthReady(true);
     });
-    return unsub;
   }, []);
 
   useEffect(() => {
@@ -176,9 +175,8 @@ export default function RootLayout() {
   useEffect(() => {
     if (!authReady) return;
     if (!auth.currentUser) return;
-    registerForPushNotifications();
-    const cleanup = setupNotificationListeners();
-    return cleanup;
+    void registerForPushNotifications();
+    return setupNotificationListeners();
   }, [authReady]);
 
   return (
