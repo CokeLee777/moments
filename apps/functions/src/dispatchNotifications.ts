@@ -1,5 +1,5 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { getUsersWithNotificationHour, getLatestTrendSummary, clearFcmToken } from './lib/firestore.js';
+import { getUsersWithNotificationHour, getLatestTrendSummary, clearFcmToken, saveUserNotification } from './lib/firestore.js';
 import { sendTrendNotification } from './lib/fcm.js';
 import type { TopicCategory } from '@moments/shared';
 
@@ -12,6 +12,7 @@ interface DispatchDeps {
   getUsers: typeof getUsersWithNotificationHour;
   getSummary: typeof getLatestTrendSummary;
   sendNotification: typeof sendTrendNotification;
+  saveNotification: typeof saveUserNotification;
   clearToken: typeof clearFcmToken;
   currentHour: number;
 }
@@ -23,7 +24,18 @@ export async function runDispatchNotifications(deps: DispatchDeps): Promise<void
       const summary = await deps.getSummary(topicId);
       if (!summary) continue;
       const result = await deps.sendNotification(user.fcmToken!, summary);
-      if (result.tokenExpired) await deps.clearToken(user.uid);
+      if (result.tokenExpired) {
+        await deps.clearToken(user.uid);
+      } else if (result.success) {
+        await deps.saveNotification(user.uid, {
+          topicId: summary.topicId,
+          trendId: summary.id,
+          title: summary.title,
+          body: summary.summary,
+          createdAt: new Date().toISOString(),
+          isRead: false,
+        });
+      }
     }
   }
 }
@@ -35,6 +47,7 @@ export const dispatchNotifications = onSchedule(
       getUsers: getUsersWithNotificationHour,
       getSummary: getLatestTrendSummary,
       sendNotification: sendTrendNotification,
+      saveNotification: saveUserNotification,
       clearToken: clearFcmToken,
       currentHour: getKstHour(),
     });

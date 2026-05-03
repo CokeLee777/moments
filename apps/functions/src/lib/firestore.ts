@@ -1,5 +1,5 @@
 import { db } from './admin.js';
-import type { TrendSummary, UserProfile, TopicCategory } from '@moments/shared';
+import type { TrendSummary, UserProfile, TopicCategory, UserNotification } from '@moments/shared';
 
 function getKstDateString(offsetDays = 0): string {
   const now = new Date();
@@ -40,4 +40,12 @@ export async function upsertUserProfile(uid: string, profile: UserProfile): Prom
 
 export async function clearFcmToken(uid: string): Promise<void> {
   await db.collection('users').doc(uid).update({ fcmToken: '' });
+}
+
+export async function saveUserNotification(
+  uid: string,
+  notification: Omit<UserNotification, 'id'>
+): Promise<void> {
+  const ref = db.collection('notifications').doc(uid).collection('items').doc();
+  await ref.set({ ...notification, id: ref.id });
 }

@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Modal, PanResponder, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, db } from '../../lib/firebase';
 
 interface NotifRecord {
   id: string;
@@ -11,13 +13,25 @@ interface NotifRecord {
   receivedAt: number;
 }
 
-export const NOTIF_STORAGE_KEY = '@moments/notifications';
-
 const TOPIC_DOT_BG: Record<string, string> = {
   ai: '#eff6ff',
   it: '#eff6ff',
-  fashion: '#eff6ff',
+  fashion: '#fdf2f8',
   automotive: '#dbeafe',
+};
+
+const TOPIC_LABEL: Record<string, string> = {
+  ai: 'AI',
+  it: 'IT',
+  fashion: '패션',
+  automotive: '자동차',
+};
+
+const TOPIC_BADGE_TEXT: Record<string, string> = {
+  ai: '#3b82f6',
+  it: '#3b82f6',
+  fashion: '#ec4899',
+  automotive: '#6366f1',
 };
 
 const TOPIC_ICONS: Record<string, string> = {
@@ -42,19 +56,84 @@ function formatTime(ts: number): string {
 }
 
 export async function appendNotification(record: NotifRecord) {
-  const raw = await AsyncStorage.getItem(NOTIF_STORAGE_KEY);
-  const list: NotifRecord[] = raw ? JSON.parse(raw) : [];
-  list.unshift(record);
-  await AsyncStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(list.slice(0, 100)));
+  const user = auth.currentUser;
+  if (!user) return;
+  await addDoc(collection(db, 'notifications', user.uid, 'items'), {
+    title: record.title,
+    body: record.body,
+    topicId: record.topicId,
+    trendId: '',
+    createdAt: new Date(record.receivedAt).toISOString(),
+    isRead: false,
+  });
+}
+
+function formatDate(ts: number): string {
+  return new Date(ts).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
 }
 
 export default function NotificationsScreen() {
   const [records, setRecords] = useState<NotifRecord[]>([]);
+  const [selected, setSelected] = useState<NotifRecord | null>(null);
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => g.dy > 5,
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) translateY.setValue(g.dy);
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 100 || g.vy > 1.2) {
+          setSelected(null);
+          translateY.setValue(0);
+        } else {
+          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
+        }
+      },
+    })
+  ).current;
 
   useEffect(() => {
-    AsyncStorage.getItem(NOTIF_STORAGE_KEY).then((raw) => {
-      if (raw) setRecords(JSON.parse(raw));
+    if (selected) translateY.setValue(0);
+  }, [selected]);
+
+  useEffect(() => {
+    let unsubFirestore: (() => void) | null = null;
+
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
+      unsubFirestore?.();
+      if (!user) {
+        setRecords([]);
+        return;
+      }
+
+      const q = query(
+        collection(db, 'notifications', user.uid, 'items'),
+        orderBy('createdAt', 'desc')
+      );
+
+      unsubFirestore = onSnapshot(q, (snap) => {
+        setRecords(
+          snap.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              title: data.title as string,
+              body: data.body as string,
+              topicId: data.topicId as string,
+              receivedAt: new Date(data.createdAt as string).getTime(),
+            };
+          })
+        );
+      });
     });
+
+    return () => {
+      unsubAuth();
+      unsubFirestore?.();
+    };
   }, []);
 
   const today = new Date().toDateString();
@@ -104,8 +183,10 @@ export default function NotificationsScreen() {
                 {group.label}
               </Text>
               {group.items.map((item) => (
-                <View
+                <TouchableOpacity
                   key={item.id}
+                  activeOpacity={0.7}
+                  onPress={() => setSelected(item)}
                   style={{ backgroundColor: '#fff', borderRadius: 16, paddingVertical: 9, paddingHorizontal: 11, flexDirection: 'row', gap: 9, alignItems: 'flex-start', borderWidth: 1, borderColor: 'rgba(0,0,0,0.045)', marginBottom: 6 }}
                 >
                   <View
@@ -116,23 +197,66 @@ export default function NotificationsScreen() {
                       {TOPIC_ICONS[item.topicId] ?? '🔔'}
                     </Text>
                   </View>
-                  <View className="flex-1">
+                  <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 9.5, fontWeight: '700', color: '#1e293b', lineHeight: 9.5 * 1.3 }}>
                       {item.title}
                     </Text>
-                    <Text style={{ fontSize: 8.5, color: '#64748b', lineHeight: 8.5 * 1.5, marginTop: 2 }}>
-                      {item.body}
-                    </Text>
+                    <View style={{ overflow: 'hidden' }}>
+                      <Text numberOfLines={3} ellipsizeMode="tail" style={{ fontSize: 8.5, color: '#64748b', lineHeight: 13, marginTop: 2 }}>
+                        {item.body}
+                      </Text>
+                    </View>
                     <Text style={{ fontSize: 7.5, color: '#94a3b8', marginTop: 3, fontWeight: '500' }}>
                       {formatTime(item.receivedAt)}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           ))
         )}
       </ScrollView>
+
+      <Modal
+        visible={selected !== null}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelected(null)}
+      >
+        <Pressable style={{ flex: 1 }} onPress={() => setSelected(null)} />
+        {selected && (
+          <Animated.View style={{ backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingBottom: 40, transform: [{ translateY }] }}>
+            {/* 핸들 — 스와이프 다운으로 닫기 */}
+            <View style={{ alignItems: 'center', paddingTop: 12, paddingBottom: 8 }} {...panResponder.panHandlers}>
+              <View style={{ width: 32, height: 4, backgroundColor: '#cbd5e1', borderRadius: 99 }} />
+            </View>
+
+            {/* 헤더 */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 14 }}>
+              <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: TOPIC_DOT_BG[selected.topicId] ?? '#eff6ff', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 16 }}>{TOPIC_ICONS[selected.topicId] ?? '🔔'}</Text>
+              </View>
+              <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99, backgroundColor: TOPIC_DOT_BG[selected.topicId] ?? '#eff6ff' }}>
+                <Text style={{ fontSize: 10, fontWeight: '700', color: TOPIC_BADGE_TEXT[selected.topicId] ?? '#3b82f6', letterSpacing: 0.2 }}>
+                  {TOPIC_LABEL[selected.topicId] ?? selected.topicId}
+                </Text>
+              </View>
+            </View>
+
+            {/* 구분선 */}
+            <View style={{ height: 1, backgroundColor: '#f1f5f9', marginHorizontal: 20 }} />
+
+            {/* 본문 */}
+            <ScrollView style={{ maxHeight: Dimensions.get('window').height * 0.62 }} contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a', lineHeight: 15 * 1.4, marginBottom: 10 }}>{selected.title}</Text>
+              <Text style={{ fontSize: 13.5, color: '#475569', lineHeight: 13.5 * 1.75 }}>{selected.body}</Text>
+              <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 16, fontWeight: '500' }}>
+                {formatDate(selected.receivedAt)} · {formatTime(selected.receivedAt)}
+              </Text>
+            </ScrollView>
+          </Animated.View>
+        )}
+      </Modal>
     </SafeAreaView>
   );
 }

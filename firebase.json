@@ -1,7 +1,10 @@
 {
-  "firestore": {
-    "rules": "firestore.rules"
-  },
+  "firestore": [
+    {
+      "database": "moments",
+      "rules": "firestore.rules"
+    }
+  ],
   "functions": [
     {
       "source": "apps/functions",

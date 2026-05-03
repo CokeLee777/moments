@@ -5,4 +5,4 @@ if (getApps().length === 0) {
   initializeApp();
 }
 
-export const db = getFirestore();
+export const db = getFirestore('moments');
