@@ -41,7 +41,7 @@ export async function runDispatchNotifications(deps: DispatchDeps): Promise<void
 }
 
 export const dispatchNotifications = onSchedule(
-  { schedule: '0 * * * *', timeZone: 'Asia/Seoul' },
+  { schedule: '0 * * * *', timeZone: 'Asia/Seoul', region: 'asia-northeast3' },
   async () => {
     await runDispatchNotifications({
       getUsers: getUsersWithNotificationHour,

@@ -54,6 +54,7 @@ export const collectTrends = onSchedule(
   {
     schedule: '50 4,16 * * *',
     timeZone: 'Asia/Seoul',
+    region: 'asia-northeast3',
     secrets: [naverClientId, naverClientSecret, geminiApiKey],
   },
   async () => {
