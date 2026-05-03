@@ -28,13 +28,13 @@ describe('runUpdateUserProfile', () => {
 
   it('topics가 3개 이상이면 에러를 던진다', async () => {
     await expect(
-      runUpdateUserProfile({ ...validInput, topics: ['ai', 'it', 'fashion'] as any })
+      runUpdateUserProfile({ ...validInput, topics: ['ai', 'it', 'fashion'] as unknown as TopicCategory[] })
     ).rejects.toThrow('topics must be 1-2 items');
   });
 
   it('유효하지 않은 topic이면 에러를 던진다', async () => {
     await expect(
-      runUpdateUserProfile({ ...validInput, topics: ['invalid'] as any })
+      runUpdateUserProfile({ ...validInput, topics: ['invalid'] as unknown as TopicCategory[] })
     ).rejects.toThrow('Invalid topic category');
   });
 

@@ -15,7 +15,7 @@ describe('runCollectTrends', () => {
     expect(summarize).toHaveBeenCalledTimes(4);
     expect(save).toHaveBeenCalledTimes(4);
 
-    const savedTopics = save.mock.calls.map((call: any) => call[0].topicId);
+    const savedTopics = (save.mock.calls as Array<[{ topicId: string }]>).map((call) => call[0].topicId);
     expect(savedTopics).toEqual(expect.arrayContaining(['it', 'ai', 'fashion', 'automotive']));
   });
 
