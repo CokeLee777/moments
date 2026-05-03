@@ -8,6 +8,7 @@ import { getUserProfile, UserProfile } from '../../lib/firestore';
 import { signOut } from '../../lib/auth';
 import { TOPIC_LABELS } from '../../components/TopicCard';
 import { formatHour } from '../../components/TimeSlot';
+import { NativeAdCard } from '../../components/NativeAdCard';
 
 export default function SettingsScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -121,6 +122,9 @@ export default function SettingsScreen() {
         >
           <Text className="text-red-500 font-bold text-[11px]">로그아웃</Text>
         </Pressable>
+
+        {/* 네이티브 광고 — 로그아웃 버튼 아래 */}
+        <NativeAdCard />
       </View>
     </SafeAreaView>
   );
