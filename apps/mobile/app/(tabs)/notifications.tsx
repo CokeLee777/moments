@@ -158,6 +158,25 @@ export default function NotificationsScreen() {
     groups[groups.length - 1].items.push(r);
   }
 
+  type FlatItem =
+    | { type: 'label'; label: string; key: string }
+    | { type: 'item'; item: NotifRecord; key: string }
+    | { type: 'ad'; key: string };
+
+  const flatItems: FlatItem[] = [];
+  let itemCount = 0;
+
+  for (const group of groups) {
+    flatItems.push({ type: 'label', label: group.label, key: `label-${group.label}` });
+    for (const item of group.items) {
+      flatItems.push({ type: 'item', item, key: item.id });
+      itemCount += 1;
+      if (itemCount % 5 === 0) {
+        flatItems.push({ type: 'ad', key: `ad-${itemCount}` });
+      }
+    }
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       <View className="bg-white px-4 pt-1.5 pb-2.5 border-b border-slate-100">
@@ -178,70 +197,49 @@ export default function NotificationsScreen() {
             <Text className="text-muted text-xs">아직 받은 알림이 없어요</Text>
           </View>
         ) : (
-          (() => {
-            type FlatItem =
-              | { type: 'label'; label: string; key: string }
-              | { type: 'item'; item: NotifRecord; key: string }
-              | { type: 'ad'; key: string };
-
-            const flat: FlatItem[] = [];
-            let itemCount = 0;
-
-            for (const group of groups) {
-              flat.push({ type: 'label', label: group.label, key: `label-${group.label}` });
-              for (const item of group.items) {
-                flat.push({ type: 'item', item, key: item.id });
-                itemCount += 1;
-                if (itemCount % 5 === 0) {
-                  flat.push({ type: 'ad', key: `ad-${itemCount}` });
-                }
-              }
-            }
-
-            return flat.map((entry) => {
-              if (entry.type === 'label') {
-                return (
-                  <Text key={entry.key} style={{ fontSize: 8, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.6, textTransform: 'uppercase', paddingTop: 4, paddingBottom: 2, paddingHorizontal: 2 }}>
-                    {entry.label}
-                  </Text>
-                );
-              }
-              if (entry.type === 'ad') {
-                return <NativeAdCard key={entry.key} />;
-              }
-              const item = entry.item;
+          flatItems.map((entry) => {
+            if (entry.type === 'label') {
               return (
-                <TouchableOpacity
-                  key={entry.key}
-                  activeOpacity={0.7}
-                  onPress={() => setSelected(item)}
-                  style={{ backgroundColor: '#fff', borderRadius: 16, paddingVertical: 9, paddingHorizontal: 11, flexDirection: 'row', gap: 9, alignItems: 'flex-start', borderWidth: 1, borderColor: 'rgba(0,0,0,0.045)', marginBottom: 6 }}
-                >
-                  <View
-                    className="w-7 h-7 rounded-[10px] items-center justify-center"
-                    style={{ backgroundColor: TOPIC_DOT_BG[item.topicId] ?? '#eff6ff' }}
-                  >
-                    <Text style={{ fontSize: 14 }}>
-                      {TOPIC_ICONS[item.topicId] ?? '🔔'}
-                    </Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 9.5, fontWeight: '700', color: '#1e293b', lineHeight: 9.5 * 1.3 }}>
-                      {item.title}
-                    </Text>
-                    <View style={{ overflow: 'hidden' }}>
-                      <Text numberOfLines={3} ellipsizeMode="tail" style={{ fontSize: 8.5, color: '#64748b', lineHeight: 13, marginTop: 2 }}>
-                        {item.body}
-                      </Text>
-                    </View>
-                    <Text style={{ fontSize: 7.5, color: '#94a3b8', marginTop: 3, fontWeight: '500' }}>
-                      {formatTime(item.receivedAt)}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                <Text key={entry.key} style={{ fontSize: 8, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.6, textTransform: 'uppercase', paddingTop: 4, paddingBottom: 2, paddingHorizontal: 2 }}>
+                  {entry.label}
+                </Text>
               );
-            });
-          })()
+            }
+            if (entry.type === 'ad') {
+              return <NativeAdCard key={entry.key} />;
+            }
+            const item = entry.item;
+            return (
+              <TouchableOpacity
+                key={entry.key}
+                activeOpacity={0.7}
+                onPress={() => setSelected(item)}
+                style={{ backgroundColor: '#fff', borderRadius: 16, paddingVertical: 9, paddingHorizontal: 11, flexDirection: 'row', gap: 9, alignItems: 'flex-start', borderWidth: 1, borderColor: 'rgba(0,0,0,0.045)', marginBottom: 6 }}
+              >
+                <View
+                  className="w-7 h-7 rounded-[10px] items-center justify-center"
+                  style={{ backgroundColor: TOPIC_DOT_BG[item.topicId] ?? '#eff6ff' }}
+                >
+                  <Text style={{ fontSize: 14 }}>
+                    {TOPIC_ICONS[item.topicId] ?? '🔔'}
+                  </Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 9.5, fontWeight: '700', color: '#1e293b', lineHeight: 9.5 * 1.3 }}>
+                    {item.title}
+                  </Text>
+                  <View style={{ overflow: 'hidden' }}>
+                    <Text numberOfLines={3} ellipsizeMode="tail" style={{ fontSize: 8.5, color: '#64748b', lineHeight: 13, marginTop: 2 }}>
+                      {item.body}
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 7.5, color: '#94a3b8', marginTop: 3, fontWeight: '500' }}>
+                    {formatTime(item.receivedAt)}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })
         )}
       </ScrollView>
 
