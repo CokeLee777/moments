@@ -100,7 +100,7 @@ export default function HomeScreen() {
             </Text>
             <View style={{ paddingHorizontal: 10, gap: 4 }}>
               {summary.articles.map((article, i) => (
-                <Fragment key={i}>
+                <Fragment key={`${summary.topicId}-${i}`}>
                   <NewsItem article={article} />
                   {i === 1 && summary.articles.length > 2 && <NativeAdCard />}
                 </Fragment>
