@@ -8,14 +8,20 @@ export function NativeAdCard() {
   const adRef = useRef<NativeAd | null>(null);
 
   useEffect(() => {
+    let mounted = true;
     NativeAd.createForAdRequest(NATIVE_AD_UNIT_ID)
       .then((ad) => {
+        if (!mounted) {
+          ad.destroy();
+          return;
+        }
         adRef.current = ad;
         setNativeAd(ad);
       })
       .catch(() => {});
 
     return () => {
+      mounted = false;
       adRef.current?.destroy();
     };
   }, []);
