@@ -214,7 +214,7 @@ export default function NotificationsScreen() {
                 key={entry.key}
                 activeOpacity={0.7}
                 onPress={() => setSelected(item)}
-                style={{ backgroundColor: '#fff', borderRadius: 16, paddingVertical: 9, paddingHorizontal: 11, flexDirection: 'row', gap: 9, alignItems: 'flex-start', borderWidth: 1, borderColor: 'rgba(0,0,0,0.045)', marginBottom: 6 }}
+                style={{ backgroundColor: '#fff', borderRadius: 16, paddingVertical: 9, paddingHorizontal: 11, flexDirection: 'row', gap: 9, alignItems: 'flex-start', borderWidth: 1, borderColor: 'rgba(0,0,0,0.045)' }}
               >
                 <View
                   className="w-7 h-7 rounded-[10px] items-center justify-center"

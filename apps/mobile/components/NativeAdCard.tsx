@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { NativeAd, NativeAdView } from 'react-native-google-mobile-ads';
+import { NativeAd, NativeAdView, NativeAsset, NativeAssetType } from 'react-native-google-mobile-ads';
 import { NATIVE_AD_UNIT_ID } from '../lib/adUnits';
 
 export function NativeAdCard() {
@@ -46,36 +46,40 @@ export function NativeAdCard() {
         <View style={{ backgroundColor: '#eff6ff', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2 }}>
           <Text style={{ fontSize: 8, fontWeight: '700', color: '#3b82f6' }}>광고</Text>
         </View>
-        {nativeAd.headline ? (
+        <NativeAsset assetType={NativeAssetType.HEADLINE}>
           <Text style={{ fontSize: 9.5, fontWeight: '700', color: '#1e293b', flex: 1 }} numberOfLines={1}>
             {nativeAd.headline}
           </Text>
-        ) : null}
+        </NativeAsset>
       </View>
 
       {/* 본문 */}
       {nativeAd.body ? (
-        <Text style={{ fontSize: 8.5, color: '#64748b', lineHeight: 13 }} numberOfLines={2}>
-          {nativeAd.body}
-        </Text>
+        <NativeAsset assetType={NativeAssetType.BODY}>
+          <Text style={{ fontSize: 8.5, color: '#64748b', lineHeight: 13 }} numberOfLines={2}>
+            {nativeAd.body}
+          </Text>
+        </NativeAsset>
       ) : null}
 
       {/* CTA 버튼 */}
       {nativeAd.callToAction ? (
-        <TouchableOpacity
-          style={{
-            alignSelf: 'flex-end',
-            backgroundColor: '#eff6ff',
-            borderRadius: 99,
-            paddingHorizontal: 10,
-            paddingVertical: 4,
-            marginTop: 2,
-          }}
-        >
-          <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#3b82f6' }}>
-            {nativeAd.callToAction}
-          </Text>
-        </TouchableOpacity>
+        <NativeAsset assetType={NativeAssetType.CALL_TO_ACTION}>
+          <TouchableOpacity
+            style={{
+              alignSelf: 'flex-end',
+              backgroundColor: '#eff6ff',
+              borderRadius: 99,
+              paddingHorizontal: 10,
+              paddingVertical: 4,
+              marginTop: 2,
+            }}
+          >
+            <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#3b82f6' }}>
+              {nativeAd.callToAction}
+            </Text>
+          </TouchableOpacity>
+        </NativeAsset>
       ) : null}
     </NativeAdView>
   );

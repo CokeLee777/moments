@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Ellipse } from 'react-native-svg';
 import { Slot, useRouter } from 'expo-router';
+import MobileAds from 'react-native-google-mobile-ads';
 import {
   useFonts,
   NotoSerifKR_900Black,
@@ -148,6 +149,10 @@ export default function RootLayout() {
   const [authReady, setAuthReady] = useState(false);
   const [destination, setDestination] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    MobileAds().initialize().catch(() => {});
+  }, []);
 
   useEffect(() => {
     return onAuthStateChanged(auth, async (user) => {
