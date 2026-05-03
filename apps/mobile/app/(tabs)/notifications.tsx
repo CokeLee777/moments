@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../../lib/firebase';
+import { NativeAdCard } from '../../components/NativeAdCard';
 
 interface NotifRecord {
   id: string;
@@ -177,14 +178,41 @@ export default function NotificationsScreen() {
             <Text className="text-muted text-xs">아직 받은 알림이 없어요</Text>
           </View>
         ) : (
-          groups.map((group) => (
-            <View key={group.label}>
-              <Text style={{ fontSize: 8, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.6, textTransform: 'uppercase', paddingTop: 4, paddingBottom: 2, paddingHorizontal: 2 }}>
-                {group.label}
-              </Text>
-              {group.items.map((item) => (
+          (() => {
+            type FlatItem =
+              | { type: 'label'; label: string; key: string }
+              | { type: 'item'; item: NotifRecord; key: string }
+              | { type: 'ad'; key: string };
+
+            const flat: FlatItem[] = [];
+            let itemCount = 0;
+
+            for (const group of groups) {
+              flat.push({ type: 'label', label: group.label, key: `label-${group.label}` });
+              for (const item of group.items) {
+                flat.push({ type: 'item', item, key: item.id });
+                itemCount += 1;
+                if (itemCount % 5 === 0) {
+                  flat.push({ type: 'ad', key: `ad-${itemCount}` });
+                }
+              }
+            }
+
+            return flat.map((entry) => {
+              if (entry.type === 'label') {
+                return (
+                  <Text key={entry.key} style={{ fontSize: 8, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.6, textTransform: 'uppercase', paddingTop: 4, paddingBottom: 2, paddingHorizontal: 2 }}>
+                    {entry.label}
+                  </Text>
+                );
+              }
+              if (entry.type === 'ad') {
+                return <NativeAdCard key={entry.key} />;
+              }
+              const item = entry.item;
+              return (
                 <TouchableOpacity
-                  key={item.id}
+                  key={entry.key}
                   activeOpacity={0.7}
                   onPress={() => setSelected(item)}
                   style={{ backgroundColor: '#fff', borderRadius: 16, paddingVertical: 9, paddingHorizontal: 11, flexDirection: 'row', gap: 9, alignItems: 'flex-start', borderWidth: 1, borderColor: 'rgba(0,0,0,0.045)', marginBottom: 6 }}
@@ -211,9 +239,9 @@ export default function NotificationsScreen() {
                     </Text>
                   </View>
                 </TouchableOpacity>
-              ))}
-            </View>
-          ))
+              );
+            });
+          })()
         )}
       </ScrollView>
 
