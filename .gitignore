@@ -20,6 +20,7 @@ firestore-debug.log
 .firebaserc.local
 apps/mobile/google-services.json
 apps/mobile/GoogleService-Info.plist
+apps/functions/serviceAccount.json
 
 # Environment
 .env
