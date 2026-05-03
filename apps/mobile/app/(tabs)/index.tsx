@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../../lib/firebase';
 import { getTrendSummary, getUserProfile, UserProfile } from '../../lib/firestore';
 import { TrendCard } from '../../components/TrendCard';
 import { NewsItem } from '../../components/NewsItem';
+import { NativeAdCard } from '../../components/NativeAdCard';
 import type { TrendSummary } from '@moments/shared';
 
 const TOPIC_LABELS: Record<string, string> = {
@@ -99,7 +100,10 @@ export default function HomeScreen() {
             </Text>
             <View style={{ paddingHorizontal: 10, gap: 4 }}>
               {summary.articles.map((article, i) => (
-                <NewsItem key={i} article={article} />
+                <Fragment key={i}>
+                  <NewsItem article={article} />
+                  {i === 1 && summary.articles.length > 2 && <NativeAdCard />}
+                </Fragment>
               ))}
             </View>
           </>
