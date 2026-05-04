@@ -2,9 +2,7 @@ import { View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Path, Svg } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { vs, s } from '../../lib/scale';
-import { BANNER_AD_UNIT_ID } from '../../lib/adUnits';
 
 function HomeIcon({ color, filled }: { color: string; filled: boolean }) {
   return (
@@ -77,10 +75,6 @@ export default function TabsLayout() {
           options={{ tabBarIcon: ({ color, focused }) => <PersonIcon color={color} filled={focused} /> }}
         />
       </Tabs>
-      <BannerAd
-        unitId={BANNER_AD_UNIT_ID}
-        size={BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER}
-      />
     </View>
   );
 }

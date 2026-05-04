@@ -53,6 +53,15 @@ export function NativeAdCard() {
         </NativeAsset>
       </View>
 
+      {/* 광고주 */}
+      {nativeAd.advertiser ? (
+        <NativeAsset assetType={NativeAssetType.ADVERTISER}>
+          <Text style={{ fontSize: 8, color: '#94a3b8' }} numberOfLines={1}>
+            {nativeAd.advertiser}
+          </Text>
+        </NativeAsset>
+      ) : null}
+
       {/* 본문 */}
       {nativeAd.body ? (
         <NativeAsset assetType={NativeAssetType.BODY}>

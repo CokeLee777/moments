@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, setDoc, where } from 'firebase/firestore';
 import type { TrendSummary, UserProfile } from '@moments/shared';
 import { db } from './firebase';
 
@@ -20,13 +20,32 @@ export async function getTrendSummary(
   topicId: string,
   dateStr: string,
 ): Promise<TrendSummary | null> {
-  const snap = await getDoc(doc(db, 'trendSummaries', `${topicId}_${dateStr}`));
-  if (snap.exists()) return snap.data() as TrendSummary;
+  const startOfDay = new Date(`${dateStr}T00:00:00+09:00`).toISOString();
+  const endOfDay = new Date(`${dateStr}T23:59:59+09:00`).toISOString();
+  const q = query(
+    collection(db, 'trendSummaries'),
+    where('topicId', '==', topicId),
+    where('createdAt', '>=', startOfDay),
+    where('createdAt', '<=', endOfDay),
+    orderBy('createdAt', 'desc'),
+    limit(1),
+  );
+  const snap = await getDocs(q);
+  if (!snap.empty) return snap.docs[0].data() as TrendSummary;
 
   const prev = new Date(dateStr);
   prev.setDate(prev.getDate() - 1);
-  const prevSnap = await getDoc(
-    doc(db, 'trendSummaries', `${topicId}_${prev.toISOString().slice(0, 10)}`),
+  const prevDateStr = prev.toISOString().slice(0, 10);
+  const prevStart = new Date(`${prevDateStr}T00:00:00+09:00`).toISOString();
+  const prevEnd = new Date(`${prevDateStr}T23:59:59+09:00`).toISOString();
+  const prevQ = query(
+    collection(db, 'trendSummaries'),
+    where('topicId', '==', topicId),
+    where('createdAt', '>=', prevStart),
+    where('createdAt', '<=', prevEnd),
+    orderBy('createdAt', 'desc'),
+    limit(1),
   );
-  return prevSnap.exists() ? (prevSnap.data() as TrendSummary) : null;
+  const prevSnap = await getDocs(prevQ);
+  return prevSnap.empty ? null : (prevSnap.docs[0].data() as TrendSummary);
 }
