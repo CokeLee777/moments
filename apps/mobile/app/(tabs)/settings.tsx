@@ -3,6 +3,7 @@ import { Alert, Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import { getUserProfile, UserProfile } from '../../lib/firestore';
 import { signOut } from '../../lib/auth';
@@ -10,14 +11,18 @@ import { TOPIC_LABELS } from '../../components/TopicCard';
 import { WebAdCard } from '../../components/WebAdCard';
 
 export default function SettingsScreen() {
+  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const router = useRouter();
-  const user = auth.currentUser;
 
   useEffect(() => {
-    if (!user) return;
-    getUserProfile(user.uid).then(setProfile);
-  }, [user]);
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      setUser(u);
+      if (!u) { setProfile(null); return; }
+      getUserProfile(u.uid).then(setProfile);
+    });
+    return unsub;
+  }, []);
 
   function handleSignOut() {
     Alert.alert('로그아웃', '정말 로그아웃할까요?', [
@@ -63,28 +68,28 @@ export default function SettingsScreen() {
             </LinearGradient>
           )}
           <View>
-            <Text className="text-[11px] font-bold text-slate-900">
+            <Text className="text-[13px] font-bold text-slate-900">
               {user?.displayName}
             </Text>
-            <Text style={{ fontSize: 8.5, color: '#94a3b8', marginTop: 1 }}>{user?.email}</Text>
+            <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 1 }}>{user?.email}</Text>
           </View>
         </View>
 
         {/* 구독 섹션 */}
-        <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingTop: 2, paddingHorizontal: 2 }}>
+        <Text style={{ fontSize: 11, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingTop: 2, paddingHorizontal: 2 }}>
           구독
         </Text>
         <View style={{ backgroundColor: '#fff', borderRadius: 18, paddingHorizontal: 12, paddingVertical: 11, borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)' }}>
           <View className="flex-row items-center justify-between" style={{ marginBottom: 7 }}>
-            <Text className="text-[10px] font-semibold text-slate-800">관심 주제</Text>
+            <Text className="text-[13px] font-semibold text-slate-800">관심 주제</Text>
             <Pressable onPress={() => router.push('/onboarding?mode=topics' as never)}>
-              <Text className="text-[8.5px] font-bold text-primary">변경</Text>
+              <Text className="text-[12px] font-bold text-primary">변경</Text>
             </Pressable>
           </View>
           <View className="flex-row gap-1.5 flex-wrap">
             {profile?.topics?.map((t) => (
               <View key={t} style={{ backgroundColor: '#eff6ff', borderRadius: 20, paddingHorizontal: 9, paddingVertical: 3 }}>
-                <Text style={{ fontSize: 8.5, fontWeight: '600', color: '#3b82f6' }}>
+                <Text style={{ fontSize: 11, fontWeight: '600', color: '#3b82f6' }}>
                   {TOPIC_LABELS[t] ?? t}
                 </Text>
               </View>
@@ -95,9 +100,9 @@ export default function SettingsScreen() {
         {/* 로그아웃 */}
         <Pressable
           onPress={handleSignOut}
-          style={{ backgroundColor: '#fff', borderRadius: 18, paddingVertical: 11, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(239,68,68,0.12)', marginTop: 4 }}
+          style={{ backgroundColor: '#fff', borderRadius: 18, paddingVertical: 14, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(239,68,68,0.12)', marginTop: 4 }}
         >
-          <Text className="text-red-500 font-bold text-[11px]">로그아웃</Text>
+          <Text className="text-red-500 font-bold text-[14px]">로그아웃</Text>
         </Pressable>
 
         {/* 웹 광고 — 로그아웃 버튼 아래 */}

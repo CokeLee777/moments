@@ -73,7 +73,7 @@ export default function OnboardingScreen() {
           >
             관심 주제
           </Text>
-          <Text style={{ fontSize: 9, color: '#94a3b8', fontWeight: '500', marginTop: 3 }}>
+          <Text style={{ fontSize: 11, color: '#94a3b8', fontWeight: '500', marginTop: 3 }}>
             최대 2개 선택
           </Text>
         </View>
@@ -85,7 +85,7 @@ export default function OnboardingScreen() {
           >
             관심 주제를{'\n'}선택해주세요
           </Text>
-          <Text style={{ fontSize: 9, color: '#94a3b8', fontWeight: '500' }}>
+          <Text style={{ fontSize: 11, color: '#94a3b8', fontWeight: '500' }}>
             최대 2개까지 선택할 수 있어요
           </Text>
         </View>
@@ -121,9 +121,9 @@ export default function OnboardingScreen() {
               colors={['#3b82f6', '#6366f1']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={{ borderRadius: 18, paddingVertical: 12, alignItems: 'center' }}
+              style={{ borderRadius: 18, paddingVertical: 14, alignItems: 'center' }}
             >
-              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 11 }}>
+              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 14 }}>
                 {btnLabel}
               </Text>
             </LinearGradient>

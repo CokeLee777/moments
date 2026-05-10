@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
-import Svg, { Defs, RadialGradient, Stop, Ellipse } from 'react-native-svg';
 import { Slot, useRouter } from 'expo-router';
 import {
   useFonts,
@@ -83,16 +82,16 @@ function LoadingScreen() {
           ],
         }}
       >
-        <Svg width={glowSize} height={glowSize}>
-          <Defs>
-            <RadialGradient id="glow" cx="50%" cy="50%" rx="50%" ry="50%">
-              <Stop offset="0%" stopColor="#6366f1" stopOpacity="0.38" />
-              <Stop offset="70%" stopColor="#6366f1" stopOpacity="0" />
-              <Stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
-            </RadialGradient>
-          </Defs>
-          <Ellipse cx={glowSize / 2} cy={glowSize / 2} rx={glowSize / 2} ry={glowSize / 2} fill="url(#glow)" />
-        </Svg>
+        <svg width={glowSize} height={glowSize}>
+          <defs>
+            <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.38" />
+              <stop offset="70%" stopColor="#6366f1" stopOpacity="0" />
+              <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <ellipse cx={glowSize / 2} cy={glowSize / 2} rx={glowSize / 2} ry={glowSize / 2} fill="url(#glow)" />
+        </svg>
       </View>
 
       {/* 글씨 잘림 방지: Animated.View로 감싸기 */}

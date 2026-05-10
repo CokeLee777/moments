@@ -15,6 +15,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import { getRecentTrendSummaries, getUserProfile } from '../../lib/firestore';
 import { WebAdCard } from '../../components/WebAdCard';
+import { MarkdownText } from '../../components/MarkdownText';
 import type { TrendSummary } from '@moments/shared';
 
 const TOPIC_DOT_BG: Record<string, string> = {
@@ -137,7 +138,7 @@ export default function HistoryScreen() {
     for (const item of group.items) {
       flat.push({ type: 'item', item, key: item.id });
       count += 1;
-      if (count % 5 === 0) flat.push({ type: 'ad', key: `ad-${count}` });
+      if (count % 3 === 0) flat.push({ type: 'ad', key: `ad-${count}` });
     }
   }
 
@@ -155,7 +156,7 @@ export default function HistoryScreen() {
       >
         {groups.length === 0 ? (
           <View className="items-center py-16">
-            <Text className="text-muted text-xs">아직 트렌드 브리핑이 없어요</Text>
+            <Text className="text-muted text-[13px]">아직 트렌드 브리핑이 없어요</Text>
           </View>
         ) : (
           flat.map((entry) => {
@@ -164,7 +165,7 @@ export default function HistoryScreen() {
                 <Text
                   key={entry.key}
                   style={{
-                    fontSize: 8,
+                    fontSize: 11,
                     fontWeight: '700',
                     color: '#94a3b8',
                     letterSpacing: 0.6,
@@ -190,17 +191,17 @@ export default function HistoryScreen() {
                 style={{
                   backgroundColor: '#fff',
                   borderRadius: 16,
-                  paddingVertical: 9,
-                  paddingHorizontal: 11,
+                  paddingVertical: 12,
+                  paddingHorizontal: 13,
                   flexDirection: 'row',
-                  gap: 9,
+                  gap: 10,
                   alignItems: 'flex-start',
                   borderWidth: 1,
                   borderColor: 'rgba(0,0,0,0.045)',
                 }}
               >
                 <View
-                  className="w-7 h-7 rounded-[10px] items-center justify-center"
+                  className="w-9 h-9 rounded-[10px] items-center justify-center"
                   style={{ backgroundColor: TOPIC_DOT_BG[item.topicId] ?? '#eff6ff' }}
                 >
                   <Text style={{ fontSize: 14 }}>{TOPIC_ICONS[item.topicId] ?? '📰'}</Text>
@@ -208,23 +209,25 @@ export default function HistoryScreen() {
                 <View style={{ flex: 1 }}>
                   <Text
                     style={{
-                      fontSize: 9.5,
+                      fontSize: 13,
                       fontWeight: '700',
                       color: '#1e293b',
-                      lineHeight: 9.5 * 1.3,
+                      lineHeight: 13 * 1.3,
                     }}
                   >
                     {item.title}
                   </Text>
-                  <Text
+                  <MarkdownText
+                    fontSize={12}
+                    color="#64748b"
+                    lineHeight={12 * 1.55}
                     numberOfLines={3}
-                    ellipsizeMode="tail"
-                    style={{ fontSize: 8.5, color: '#64748b', lineHeight: 13, marginTop: 2 }}
+                    marginTop={3}
                   >
                     {item.summary}
-                  </Text>
+                  </MarkdownText>
                   <Text
-                    style={{ fontSize: 7.5, color: '#94a3b8', marginTop: 3, fontWeight: '500' }}
+                    style={{ fontSize: 11, color: '#94a3b8', marginTop: 4, fontWeight: '500' }}
                   >
                     {formatTime(item.createdAt)}
                   </Text>
@@ -322,11 +325,13 @@ export default function HistoryScreen() {
               >
                 {selected.title}
               </Text>
-              <Text
-                style={{ fontSize: 13.5, color: '#475569', lineHeight: 13.5 * 1.75 }}
+              <MarkdownText
+                fontSize={13.5}
+                color="#475569"
+                lineHeight={13.5 * 1.75}
               >
                 {selected.summary}
-              </Text>
+              </MarkdownText>
               <Text
                 style={{ fontSize: 11, color: '#94a3b8', marginTop: 16, fontWeight: '500' }}
               >

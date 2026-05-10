@@ -1,6 +1,5 @@
 import { Linking, Pressable, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path } from 'react-native-svg';
 import type { Article } from '@moments/shared';
 import { s, vs } from '../lib/scale';
 
@@ -18,14 +17,14 @@ export function NewsItem({ article }: Props) {
       accessibilityLabel={article.title}
       style={{
         backgroundColor: '#fff',
-        borderRadius: 14,
-        paddingTop: 8,
-        paddingBottom: 8,
+        borderRadius: 16,
+        paddingTop: 12,
+        paddingBottom: 12,
         paddingLeft: 0,
-        paddingRight: 8,
+        paddingRight: 12,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: 10,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.045)',
       }}
@@ -35,14 +34,14 @@ export function NewsItem({ article }: Props) {
         colors={['#3b82f6', '#8b5cf6']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
-        style={{ width: s(3), height: vs(30), borderRadius: 4, marginLeft: s(10) }}
+        style={{ width: s(3), height: vs(44), borderRadius: 4, marginLeft: s(12) }}
       />
 
       <View style={{ flex: 1 }}>
         <Text
           numberOfLines={2}
           ellipsizeMode="tail"
-          style={{ fontSize: 9, color: '#1e293b', fontWeight: '600', lineHeight: 9 * 1.4 }}
+          style={{ fontSize: 13, color: '#1e293b', fontWeight: '600', lineHeight: 13 * 1.4 }}
         >
           {article.title}
         </Text>
@@ -55,7 +54,7 @@ export function NewsItem({ article }: Props) {
               paddingVertical: 1,
             }}
           >
-            <Text style={{ fontSize: 7, color: '#64748b', fontWeight: '700' }}>
+            <Text style={{ fontSize: 10.5, color: '#64748b', fontWeight: '700' }}>
               {article.source}
             </Text>
           </View>
@@ -63,21 +62,21 @@ export function NewsItem({ article }: Props) {
       </View>
 
       {/* 오른쪽 chevron */}
-      <Svg
+      <svg
         width={7}
         height={12}
         viewBox="0 0 8 14"
         fill="none"
         style={{ opacity: 0.35 }}
       >
-        <Path
+        <path
           d="M1 1l6 6-6 6"
           stroke="#94a3b8"
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-      </Svg>
+      </svg>
     </Pressable>
   );
 }

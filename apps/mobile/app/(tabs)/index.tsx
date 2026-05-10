@@ -57,7 +57,7 @@ export default function HomeScreen() {
           찰나
         </Text>
         <View style={{ backgroundColor: '#f1f5f9', borderRadius: 10, paddingHorizontal: 9, paddingVertical: 3 }}>
-          <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#64748b', letterSpacing: -0.1 }}>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: '#64748b', letterSpacing: -0.1 }}>
             {formatDateKo()}
           </Text>
         </View>
@@ -70,10 +70,10 @@ export default function HomeScreen() {
             <TouchableOpacity
               key={topicId}
               onPress={() => setActiveIdx(idx)}
-              className="flex-1 pt-2 pb-[7px] items-center"
+              className="flex-1 pt-3 pb-[10px] items-center"
             >
               <Text
-                className={`text-[11px] font-semibold ${
+                className={`text-[13px] font-semibold ${
                   idx === activeIdx ? 'text-primary' : 'text-muted'
                 }`}
               >
@@ -95,7 +95,7 @@ export default function HomeScreen() {
         {summary ? (
           <>
             <TrendCard summary={summary} />
-            <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingHorizontal: 10, paddingBottom: 5 }}>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingHorizontal: 10, paddingBottom: 5 }}>
               관련 뉴스
             </Text>
             <View style={{ paddingHorizontal: 10, gap: 4 }}>

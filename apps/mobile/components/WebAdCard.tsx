@@ -33,7 +33,7 @@ export function WebAdCard() {
       style={{
         backgroundColor: '#fff',
         borderRadius: 16,
-        minHeight: 100,
+        minHeight: 80,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.045)',
         overflow: 'hidden',

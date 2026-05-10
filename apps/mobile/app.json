@@ -7,7 +7,7 @@
     "userInterfaceStyle": "light",
     "web": {
       "bundler": "metro",
-      "output": "single",
+      "output": "static",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [

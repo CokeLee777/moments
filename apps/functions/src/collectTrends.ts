@@ -44,7 +44,7 @@ export async function runCollectTrends(deps: CollectDeps): Promise<void> {
       summary,
       articles,
       sourceUrls: articles.map((a) => a.url),
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().replace('Z', '+09:00'),
     });
   }
 }

@@ -20,8 +20,8 @@ export async function getTrendSummary(
   topicId: string,
   dateStr: string,
 ): Promise<TrendSummary | null> {
-  const startOfDay = new Date(`${dateStr}T00:00:00+09:00`).toISOString();
-  const endOfDay = new Date(`${dateStr}T23:59:59+09:00`).toISOString();
+  const startOfDay = `${dateStr}T00:00:00.000+09:00`;
+  const endOfDay = `${dateStr}T23:59:59.999+09:00`;
   const q = query(
     collection(db, 'trendSummaries'),
     where('topicId', '==', topicId),
@@ -36,8 +36,8 @@ export async function getTrendSummary(
   const prev = new Date(dateStr);
   prev.setDate(prev.getDate() - 1);
   const prevDateStr = prev.toISOString().slice(0, 10);
-  const prevStart = new Date(`${prevDateStr}T00:00:00+09:00`).toISOString();
-  const prevEnd = new Date(`${prevDateStr}T23:59:59+09:00`).toISOString();
+  const prevStart = `${prevDateStr}T00:00:00.000+09:00`;
+  const prevEnd = `${prevDateStr}T23:59:59.999+09:00`;
   const prevQ = query(
     collection(db, 'trendSummaries'),
     where('topicId', '==', topicId),
@@ -55,7 +55,7 @@ export async function getRecentTrendSummaries(
   count: number = 50,
 ): Promise<TrendSummary[]> {
   if (topics.length === 0) return [];
-  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000 + 9 * 60 * 60 * 1000).toISOString().replace('Z', '+09:00');
   const q = query(
     collection(db, 'trendSummaries'),
     where('topicId', 'in', topics),
