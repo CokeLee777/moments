@@ -16,14 +16,19 @@ function HomeIcon({ color, filled }: { color: string; filled: boolean }) {
   );
 }
 
-function BellIcon({ color, filled }: { color: string; filled: boolean }) {
-  const d = 'M12 2a7 7 0 0 0-7 7v3.17L3 15v1h18v-1l-2-2.83V9a7 7 0 0 0-7-7zm0 20a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2z';
+function ClockIcon({ color, filled }: { color: string; filled: boolean }) {
   return (
     <Svg width={s(16)} height={s(16)} viewBox="0 0 24 24">
       {filled ? (
-        <Path d={d} fill={color} />
+        <>
+          <Path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z" fill={color} />
+          <Path d="M12 7v5l3 3" stroke="#fff" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
       ) : (
-        <Path d={d} stroke={color} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <>
+          <Path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z" stroke={color} strokeWidth={1.7} fill="none" />
+          <Path d="M12 7v5l3 3" stroke={color} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </>
       )}
     </Svg>
   );
@@ -67,8 +72,8 @@ export default function TabsLayout() {
           options={{ tabBarIcon: ({ color, focused }) => <HomeIcon color={color} filled={focused} /> }}
         />
         <Tabs.Screen
-          name="notifications"
-          options={{ tabBarIcon: ({ color, focused }) => <BellIcon color={color} filled={focused} /> }}
+          name="history"
+          options={{ tabBarIcon: ({ color, focused }) => <ClockIcon color={color} filled={focused} /> }}
         />
         <Tabs.Screen
           name="settings"
