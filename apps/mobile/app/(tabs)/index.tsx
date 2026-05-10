@@ -1,8 +1,8 @@
 import { useEffect, useState, Fragment } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { auth } from '../../lib/firebase';
-import { getTrendSummary, getUserProfile, UserProfile } from '../../lib/firestore';
+import { useAuth } from '../../lib/auth-context';
+import { getTrendSummary } from '../../lib/firestore';
 import { TrendCard } from '../../components/TrendCard';
 import { NewsItem } from '../../components/NewsItem';
 import { WebAdCard } from '../../components/WebAdCard';
@@ -28,15 +28,9 @@ function formatDateKo(): string {
 }
 
 export default function HomeScreen() {
-  const user = auth.currentUser;
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const { profile } = useAuth();
   const [activeIdx, setActiveIdx] = useState(0);
   const [summary, setSummary] = useState<TrendSummary | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    getUserProfile(user.uid).then(setProfile);
-  }, [user]);
 
   useEffect(() => {
     if (!profile?.topics?.length) return;

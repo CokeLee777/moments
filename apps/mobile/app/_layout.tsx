@@ -6,11 +6,11 @@ import {
   useFonts,
   NotoSerifKR_900Black,
 } from '@expo-google-fonts/noto-serif-kr';
-import { getRedirectResult, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../lib/firebase';
-import { getUserProfile } from '../lib/firestore';
+import { AuthProvider, useAuth } from '../lib/auth-context';
 import { ms, s, vs } from '../lib/scale';
 import '../global.css';
+
+const SPLASH_MIN_MS = 1500;
 
 function LoadingScreen() {
   const breatheAnim = useRef(new Animated.Value(0.75)).current;
@@ -21,7 +21,6 @@ function LoadingScreen() {
   ];
 
   useEffect(() => {
-    // "찰나" 숨쉬기 (opacity 0.75 ↔ 1)
     Animated.loop(
       Animated.sequence([
         Animated.timing(breatheAnim, {
@@ -39,7 +38,6 @@ function LoadingScreen() {
       ]),
     ).start();
 
-    // 점 bounce + opacity
     Animated.parallel(
       dotAnims.map((anim, i) =>
         Animated.loop(
@@ -69,7 +67,6 @@ function LoadingScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#060b16', alignItems: 'center', justifyContent: 'center' }}>
-      {/* Glow: SVG RadialGradient — 목업과 동일한 rgba(99,102,241,0.38) 0% → transparent 70% */}
       <View
         style={{
           position: 'absolute',
@@ -95,7 +92,6 @@ function LoadingScreen() {
         </svg>
       </View>
 
-      {/* 글씨 잘림 방지: Animated.View로 감싸기 */}
       <Animated.View style={{ opacity: breatheAnim, paddingVertical: s(4) }}>
         <Text
           style={{
@@ -142,35 +138,26 @@ function LoadingScreen() {
   );
 }
 
-export default function RootLayout() {
+function RootContent() {
   const [fontsLoaded] = useFonts({ NotoSerifKR_900Black });
-  const [authReady, setAuthReady] = useState(false);
-  const [destination, setDestination] = useState<string | null>(null);
+  const [splashMinDone, setSplashMinDone] = useState(false);
+  const { user, profile, authReady } = useAuth();
   const router = useRouter();
+  const lastRouteRef = useRef<string | null>(null);
 
   useEffect(() => {
-    getRedirectResult(auth).catch(() => {});
-    return onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        setDestination('/login');
-      } else {
-        try {
-          const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000));
-          const profile = await Promise.race([getUserProfile(user.uid), timeout]);
-          setDestination(profile ? '/(tabs)' : '/onboarding');
-        } catch {
-          setDestination('/onboarding');
-        }
-      }
-      setAuthReady(true);
-    });
+    const t = setTimeout(() => setSplashMinDone(true), SPLASH_MIN_MS);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
-    if (authReady && fontsLoaded && destination) {
-      router.replace(destination as never);
-    }
-  }, [authReady, fontsLoaded, destination]);
+    if (!authReady || !fontsLoaded || !splashMinDone) return;
+    const dest = !user ? '/login' : !profile ? '/onboarding' : '/(tabs)';
+    if (lastRouteRef.current === dest) return;
+    lastRouteRef.current = dest;
+    (window as any).hideSplash?.();
+    router.replace(dest as never);
+  }, [authReady, fontsLoaded, splashMinDone, user, profile]);
 
   return (
     <>
@@ -192,5 +179,13 @@ export default function RootLayout() {
         )}
       </View>
     </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootContent />
+    </AuthProvider>
   );
 }

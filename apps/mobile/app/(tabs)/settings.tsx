@@ -1,38 +1,18 @@
-import { useEffect, useState } from 'react';
-import { Alert, Image, Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
-import { getUserProfile, UserProfile } from '../../lib/firestore';
+import { useAuth } from '../../lib/auth-context';
 import { signOut } from '../../lib/auth';
 import { TOPIC_LABELS } from '../../components/TopicCard';
 import { WebAdCard } from '../../components/WebAdCard';
 
 export default function SettingsScreen() {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const { user, profile } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (!u) { setProfile(null); return; }
-      getUserProfile(u.uid).then(setProfile);
-    });
-    return unsub;
-  }, []);
-
   function handleSignOut() {
-    Alert.alert('로그아웃', '정말 로그아웃할까요?', [
-      { text: '취소', style: 'cancel' },
-      {
-        text: '로그아웃',
-        style: 'destructive',
-        onPress: () => signOut(),
-      },
-    ]);
+    signOut();
   }
 
   return (

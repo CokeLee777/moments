@@ -3,8 +3,8 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { auth } from '../lib/firebase';
-import { getUserProfile, updateUserProfile } from '../lib/firestore';
+import { useAuth } from '../lib/auth-context';
+import { updateUserProfile } from '../lib/firestore';
 import { TopicCard } from '../components/TopicCard';
 import type { TopicCategory } from '@moments/shared';
 
@@ -15,19 +15,16 @@ type Mode = 'onboard' | 'topics';
 export default function OnboardingScreen() {
   const { mode = 'onboard' } = useLocalSearchParams<{ mode?: Mode }>();
   const router = useRouter();
-  const user = auth.currentUser;
+  const { user, profile, setProfile } = useAuth();
 
   const isEditMode = mode !== 'onboard';
 
   const [selectedTopics, setSelectedTopics] = useState<TopicCategory[]>([]);
 
   useEffect(() => {
-    if (!isEditMode || !user) return;
-    getUserProfile(user.uid).then((profile) => {
-      if (!profile) return;
-      setSelectedTopics(profile.topics ?? []);
-    });
-  }, [isEditMode, user]);
+    if (!isEditMode || !profile) return;
+    setSelectedTopics(profile.topics ?? []);
+  }, [isEditMode, profile]);
 
   function toggleTopic(id: TopicCategory) {
     setSelectedTopics((prev) =>
@@ -43,18 +40,23 @@ export default function OnboardingScreen() {
     if (!user) return;
 
     if (mode === 'topics') {
-      try { await updateUserProfile(user.uid, { topics: selectedTopics }); } catch { /* ignore */ }
+      try {
+        await updateUserProfile(user.uid, { topics: selectedTopics });
+        setProfile(profile ? { ...profile, topics: selectedTopics } : null);
+      } catch { /* ignore */ }
       router.replace('/(tabs)/settings' as never);
       return;
     }
 
+    const updated = {
+      displayName: user.displayName ?? '',
+      email: user.email ?? '',
+      photoURL: user.photoURL,
+      topics: selectedTopics,
+    };
     try {
-      await updateUserProfile(user.uid, {
-        displayName: user.displayName ?? '',
-        email: user.email ?? '',
-        photoURL: user.photoURL,
-        topics: selectedTopics,
-      });
+      await updateUserProfile(user.uid, updated);
+      setProfile(updated);
     } catch { /* ignore */ }
     router.replace('/(tabs)');
   }

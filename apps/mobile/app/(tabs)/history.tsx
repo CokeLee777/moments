@@ -11,9 +11,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
-import { getRecentTrendSummaries, getUserProfile } from '../../lib/firestore';
+import { useAuth } from '../../lib/auth-context';
+import { getRecentTrendSummaries } from '../../lib/firestore';
 import { WebAdCard } from '../../components/WebAdCard';
 import { MarkdownText } from '../../components/MarkdownText';
 import type { TrendSummary } from '@moments/shared';
@@ -78,6 +77,7 @@ function formatTime(dateStr: string): string {
 }
 
 export default function HistoryScreen() {
+  const { user, profile } = useAuth();
   const [summaries, setSummaries] = useState<TrendSummary[]>([]);
   const [selected, setSelected] = useState<TrendSummary | null>(null);
   const translateY = useRef(new Animated.Value(0)).current;
@@ -105,15 +105,9 @@ export default function HistoryScreen() {
   }, [selected]);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) { setSummaries([]); return; }
-      const profile = await getUserProfile(user.uid);
-      if (!profile?.topics?.length) return;
-      const data = await getRecentTrendSummaries(profile.topics);
-      setSummaries(data);
-    });
-    return unsub;
-  }, []);
+    if (!user || !profile?.topics?.length) { setSummaries([]); return; }
+    getRecentTrendSummaries(profile.topics).then(setSummaries);
+  }, [user, profile]);
 
   const groups: { label: string; items: TrendSummary[] }[] = [];
   const seen = new Set<string>();

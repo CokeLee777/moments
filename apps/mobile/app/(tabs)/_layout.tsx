@@ -56,7 +56,7 @@ export default function TabsLayout() {
           headerShown: false,
           tabBarShowLabel: false,
           tabBarStyle: {
-            height: Math.max(vs(49), 49) + insets.bottom,
+            height: Math.max(vs(64), 64) + insets.bottom,
             paddingBottom: insets.bottom,
             borderTopWidth: 1,
             borderTopColor: '#f1f5f9',
