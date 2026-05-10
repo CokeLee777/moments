@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Ellipse } from 'react-native-svg';
 import { Slot, useRouter } from 'expo-router';
-import MobileAds from 'react-native-google-mobile-ads';
 import {
   useFonts,
   NotoSerifKR_900Black,
@@ -10,7 +9,6 @@ import {
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { getUserProfile } from '../lib/firestore';
-import { registerForPushNotifications, setupNotificationListeners } from '../lib/notifications';
 import { ms, s, vs } from '../lib/scale';
 import '../global.css';
 
@@ -151,10 +149,6 @@ export default function RootLayout() {
   const router = useRouter();
 
   useEffect(() => {
-    MobileAds().initialize().catch(() => {});
-  }, []);
-
-  useEffect(() => {
     return onAuthStateChanged(auth, async (user) => {
       if (!user) {
         setDestination('/login');
@@ -176,13 +170,6 @@ export default function RootLayout() {
       router.replace(destination as never);
     }
   }, [authReady, fontsLoaded, destination]);
-
-  useEffect(() => {
-    if (!authReady) return;
-    if (!auth.currentUser) return;
-    void registerForPushNotifications();
-    return setupNotificationListeners();
-  }, [authReady]);
 
   return (
     <View style={{ flex: 1 }}>
