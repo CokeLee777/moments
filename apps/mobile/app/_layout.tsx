@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { Slot, useRouter } from 'expo-router';
+import Head from 'expo-router/head';
 import {
   useFonts,
   NotoSerifKR_900Black,
@@ -172,13 +173,24 @@ export default function RootLayout() {
   }, [authReady, fontsLoaded, destination]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <Slot />
-      {(!authReady || !fontsLoaded) && (
-        <View style={StyleSheet.absoluteFill}>
-          <LoadingScreen />
-        </View>
-      )}
-    </View>
+    <>
+      <Head>
+        <meta name="theme-color" content="#060b16" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="찰나" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <title>찰나</title>
+      </Head>
+      <View style={{ flex: 1 }}>
+        <Slot />
+        {(!authReady || !fontsLoaded) && (
+          <View style={StyleSheet.absoluteFill}>
+            <LoadingScreen />
+          </View>
+        )}
+      </View>
+    </>
   );
 }
