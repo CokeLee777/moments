@@ -86,7 +86,7 @@ export default function SettingsScreen() {
         </Pressable>
 
         {/* 웹 광고 — 로그아웃 버튼 아래 */}
-        <WebAdCard />
+        {/* <WebAdCard /> */}
       </View>
     </SafeAreaView>
   );

@@ -174,7 +174,7 @@ export default function HistoryScreen() {
               );
             }
             if (entry.type === 'ad') {
-              return <WebAdCard key={entry.key} />;
+              return null; // return <WebAdCard key={entry.key} />;
             }
             const item = entry.item;
             return (

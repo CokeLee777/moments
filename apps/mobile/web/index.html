@@ -14,10 +14,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="찰나" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@900&display=swap" rel="stylesheet" />
     <style>
+      #root { visibility: hidden; }
       #splash {
         position: fixed;
         inset: 0;
@@ -56,19 +54,21 @@
       }
 
       #splash-name {
-        font-family: 'Noto Serif KR', serif;
+        font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
         font-weight: 900;
         font-size: 38px;
         color: #f1f5f9;
         letter-spacing: -1px;
-        animation: splashFadeIn 0.5s ease 0.5s both;
+        opacity: 0;
+        animation: splashFadeIn 0.5s ease 0.5s forwards;
       }
 
       #splash-divider {
         width: 32px;
         height: 1px;
         background: linear-gradient(90deg, transparent, #6366f1, transparent);
-        animation: splashFadeIn 0.4s ease 0.8s both;
+        opacity: 0;
+        animation: splashFadeIn 0.4s ease 0.8s forwards;
       }
 
       #splash-slogan {
@@ -77,7 +77,8 @@
         color: rgba(255,255,255,0.45);
         letter-spacing: 0.3px;
         text-align: center;
-        animation: splashSlideUp 0.5s ease 1s both;
+        opacity: 0;
+        animation: splashSlideUp 0.5s ease 1s forwards;
       }
 
       @keyframes splashIconIn {
@@ -119,6 +120,8 @@
     <div id="root"></div>
     <script>
       window.hideSplash = function () {
+        var root = document.getElementById('root');
+        if (root) root.style.visibility = 'visible';
         var el = document.getElementById('splash');
         if (!el) return;
         el.classList.add('hiding');

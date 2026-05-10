@@ -96,7 +96,7 @@ export default function HomeScreen() {
               {summary.articles.map((article, i) => (
                 <Fragment key={`${summary.topicId}-${i}`}>
                   <NewsItem article={article} />
-                  {i === 1 && summary.articles.length > 2 && <WebAdCard />}
+                  {/* {i === 1 && summary.articles.length > 2 && <WebAdCard />} */}
                 </Fragment>
               ))}
             </View>

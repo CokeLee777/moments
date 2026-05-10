@@ -19,17 +19,15 @@ const SPLASH_CSS = `
 #pwa-splash.hiding{opacity:0;pointer-events:none;}
 #pwa-splash-glow{position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.35) 0%,transparent 70%);animation:splashGlowPulse 2.4s ease-in-out infinite;}
 #pwa-splash-icon{width:80px;height:80px;border-radius:22px;background-image:url('${ICON_DATA_URL}');background-size:cover;animation:splashIconIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards,splashIconPulse 2s ease-in-out 0.6s infinite;opacity:0;}
-#pwa-splash-name{font-family:'Noto Serif KR',serif;font-weight:900;font-size:38px;color:#f1f5f9;letter-spacing:-1px;animation:splashFadeIn 0.5s ease 0.5s both;}
-#pwa-splash-divider{width:32px;height:1px;background:linear-gradient(90deg,transparent,#6366f1,transparent);animation:splashFadeIn 0.4s ease 0.8s both;}
-#pwa-splash-slogan{font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:13px;color:rgba(255,255,255,0.45);letter-spacing:0.3px;text-align:center;animation:splashSlideUp 0.5s ease 1s both;}
+#pwa-splash-name{font-family:-apple-system,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;font-weight:900;font-size:38px;color:#f1f5f9;letter-spacing:-1px;opacity:0;animation:splashFadeIn 0.5s ease 0.5s forwards;}
+#pwa-splash-divider{width:32px;height:1px;background:linear-gradient(90deg,transparent,#6366f1,transparent);opacity:0;animation:splashFadeIn 0.4s ease 0.8s forwards;}
+#pwa-splash-slogan{font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:13px;color:rgba(255,255,255,0.45);letter-spacing:0.3px;text-align:center;opacity:0;animation:splashSlideUp 0.5s ease 1s forwards;}
 @keyframes splashIconIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
 @keyframes splashIconPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(99,102,241,0.5)}50%{transform:scale(1.06);box-shadow:0 0 0 12px rgba(99,102,241,0)}}
 @keyframes splashFadeIn{from{opacity:0}to{opacity:1}}
 @keyframes splashSlideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes splashGlowPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
 </style>`;
-
-const SPLASH_FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" /><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@900&display=swap" rel="stylesheet" />`;
 
 const SPLASH_HTML = `
 <div id="pwa-splash">
@@ -39,14 +37,21 @@ const SPLASH_HTML = `
   <div id="pwa-splash-divider"></div>
   <div id="pwa-splash-slogan">오늘의 트렌드를 한눈에 만나세요</div>
 </div>
-<script>window.hideSplash=function(){var e=document.getElementById('pwa-splash');if(!e)return;e.classList.add('hiding');setTimeout(function(){e.remove();},500);};</script>`;
+<script>window.hideSplash=function(){var r=document.getElementById('root');if(r)r.style.visibility='visible';var e=document.getElementById('pwa-splash');if(!e)return;e.classList.add('hiding');setTimeout(function(){e.remove();},500);};</script>`;
+
+// Injected first in <head> so #root is hidden before any paint
+const ROOT_HIDE_CSS = `<style id="pwa-root-hide">#root{visibility:hidden}</style>`;
 
 function processHtml(content) {
-  // Inject fonts into <head>
-  if (!content.includes('Noto+Serif+KR')) {
-    content = content.replace('</head>', SPLASH_FONTS + SPLASH_CSS + '</head>');
+  // 1. Hide #root before first paint (injected right after <head>)
+  if (!content.includes('id="pwa-root-hide"')) {
+    content = content.replace('<head>', '<head>' + ROOT_HIDE_CSS);
   }
-  // Inject splash HTML right after <body> tag (before #root)
+  // 2. Splash CSS at end of <head>
+  if (!content.includes('id="pwa-splash-css"')) {
+    content = content.replace('</head>', SPLASH_CSS + '</head>');
+  }
+  // 3. Splash HTML before #root
   if (!content.includes('id="pwa-splash"')) {
     content = content.replace('<div id="root">', SPLASH_HTML + '\n<div id="root">');
   }
