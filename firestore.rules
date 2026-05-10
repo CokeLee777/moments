@@ -8,9 +8,5 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if false;
     }
-    match /notifications/{uid}/items/{itemId} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if false;
-    }
   }
 }

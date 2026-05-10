@@ -6,7 +6,7 @@ import {
   useFonts,
   NotoSerifKR_900Black,
 } from '@expo-google-fonts/noto-serif-kr';
-import { onAuthStateChanged } from 'firebase/auth';
+import { getRedirectResult, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { getUserProfile } from '../lib/firestore';
 import { ms, s, vs } from '../lib/scale';
@@ -149,6 +149,7 @@ export default function RootLayout() {
   const router = useRouter();
 
   useEffect(() => {
+    getRedirectResult(auth).catch(() => {});
     return onAuthStateChanged(auth, async (user) => {
       if (!user) {
         setDestination('/login');
