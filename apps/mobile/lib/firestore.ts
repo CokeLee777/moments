@@ -49,3 +49,20 @@ export async function getTrendSummary(
   const prevSnap = await getDocs(prevQ);
   return prevSnap.empty ? null : (prevSnap.docs[0].data() as TrendSummary);
 }
+
+export async function getRecentTrendSummaries(
+  topics: string[],
+  count: number = 50,
+): Promise<TrendSummary[]> {
+  if (topics.length === 0) return [];
+  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const q = query(
+    collection(db, 'trendSummaries'),
+    where('topicId', 'in', topics),
+    where('createdAt', '>=', cutoff),
+    orderBy('createdAt', 'desc'),
+    limit(count),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data() as TrendSummary);
+}
