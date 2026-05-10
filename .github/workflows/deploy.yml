@@ -34,13 +34,12 @@ jobs:
       - name: Build functions
         run: pnpm --filter @moments/functions build
 
-      - name: Deploy to Firebase
+      - name: Deploy to Firebase Functions
         run: npx firebase-tools@14 deploy --only functions --force --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
 
-  deploy-mobile:
+  deploy-web:
     if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/')
-    needs: deploy-functions
-    name: EAS Build & Submit
+    name: Deploy Web (Firebase Hosting)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,15 +54,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Build shared
+        run: pnpm --filter @moments/shared build
 
-      - name: EAS Build
+      - name: Expo Web Build
         working-directory: apps/mobile
-        run: eas build --platform all --profile production --non-interactive
+        run: npx expo export --platform web
 
-      - name: EAS Submit
-        working-directory: apps/mobile
-        run: eas submit --platform all --profile production --non-interactive
+      - name: Deploy to Firebase Hosting
+        run: npx firebase-tools@14 deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
