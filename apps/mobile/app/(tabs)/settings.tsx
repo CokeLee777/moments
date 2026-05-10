@@ -7,8 +7,7 @@ import { auth } from '../../lib/firebase';
 import { getUserProfile, UserProfile } from '../../lib/firestore';
 import { signOut } from '../../lib/auth';
 import { TOPIC_LABELS } from '../../components/TopicCard';
-import { formatHour } from '../../components/TimeSlot';
-import { NativeAdCard } from '../../components/NativeAdCard';
+import { WebAdCard } from '../../components/WebAdCard';
 
 export default function SettingsScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -93,28 +92,6 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* 알림 섹션 */}
-        <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingTop: 2, paddingHorizontal: 2 }}>
-          알림
-        </Text>
-        <View style={{ backgroundColor: '#fff', borderRadius: 18, paddingHorizontal: 12, paddingVertical: 11, borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)' }}>
-          <View className="flex-row items-center justify-between" style={{ marginBottom: 7 }}>
-            <Text className="text-[10px] font-semibold text-slate-800">알림 시간</Text>
-            <Pressable onPress={() => router.push('/onboarding?mode=times' as never)}>
-              <Text className="text-[8.5px] font-bold text-primary">변경</Text>
-            </Pressable>
-          </View>
-          <View className="flex-row gap-1.5 flex-wrap">
-            {profile?.notificationTimes?.map((h) => (
-              <View key={h} style={{ backgroundColor: '#eff6ff', borderRadius: 20, paddingHorizontal: 9, paddingVertical: 3 }}>
-                <Text style={{ fontSize: 8.5, fontWeight: '600', color: '#3b82f6' }}>
-                  {formatHour(h)}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
         {/* 로그아웃 */}
         <Pressable
           onPress={handleSignOut}
@@ -123,8 +100,8 @@ export default function SettingsScreen() {
           <Text className="text-red-500 font-bold text-[11px]">로그아웃</Text>
         </Pressable>
 
-        {/* 네이티브 광고 — 로그아웃 버튼 아래 */}
-        <NativeAdCard />
+        {/* 웹 광고 — 로그아웃 버튼 아래 */}
+        <WebAdCard />
       </View>
     </SafeAreaView>
   );
