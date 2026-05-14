@@ -5,7 +5,6 @@ import { useAuth } from '../../lib/auth-context';
 import { getTrendSummary } from '../../lib/firestore';
 import { TrendCard } from '../../components/TrendCard';
 import { NewsItem } from '../../components/NewsItem';
-import { WebAdCard } from '../../components/WebAdCard';
 import type { TrendSummary } from '@moments/shared';
 
 const TOPIC_LABELS: Record<string, string> = {

@@ -13,7 +13,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../lib/auth-context';
 import { getRecentTrendSummaries } from '../../lib/firestore';
-import { WebAdCard } from '../../components/WebAdCard';
 import { MarkdownText } from '../../components/MarkdownText';
 import type { TrendSummary } from '@moments/shared';
 

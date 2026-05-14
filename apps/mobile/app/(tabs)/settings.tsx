@@ -5,7 +5,6 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../lib/auth-context';
 import { signOut } from '../../lib/auth';
 import { TOPIC_LABELS } from '../../components/TopicCard';
-import { WebAdCard } from '../../components/WebAdCard';
 
 export default function SettingsScreen() {
   const { user, profile } = useAuth();

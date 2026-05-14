@@ -155,7 +155,7 @@ function RootContent() {
     const dest = !user ? '/login' : !profile ? '/onboarding' : '/(tabs)';
     if (lastRouteRef.current === dest) return;
     lastRouteRef.current = dest;
-    (window as any).hideSplash?.();
+    (window as Window & { hideSplash?: () => void }).hideSplash?.();
     router.replace(dest as never);
   }, [authReady, fontsLoaded, splashMinDone, user, profile]);
 
