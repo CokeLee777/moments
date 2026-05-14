@@ -51,7 +51,7 @@ export async function runCollectTrends(deps: CollectDeps): Promise<void> {
 
 export const collectTrends = onSchedule(
   {
-    schedule: '50 4,16 * * *',
+    schedule: '0 5 * * *',
     timeZone: 'Asia/Seoul',
     region: 'asia-northeast3',
     secrets: [naverClientId, naverClientSecret, geminiApiKey],
