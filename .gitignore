@@ -6,6 +6,7 @@ node_modules/
 dist/
 **/lib/
 !**/src/**/lib/
+!apps/mobile/lib/
 .expo/
 src/**/*.js
 
