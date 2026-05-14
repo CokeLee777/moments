@@ -10,10 +10,10 @@ const naverClientSecret = defineSecret('NAVER_CLIENT_SECRET');
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
 
 const TOPIC_QUERIES: Record<TopicCategory, string> = {
-  it: 'IT 기술 트렌드',
-  ai: '인공지능 AI',
-  fashion: '패션 트렌드',
-  automotive: '자동차',
+  it: 'IT 기술 신제품 서비스',
+  ai: '인공지능 AI 기술 서비스 출시',
+  fashion: '패션 트렌드 브랜드 스타일',
+  automotive: '자동차 신차 전기차 기술',
 };
 
 const TOPIC_TITLES: Record<TopicCategory, string> = {
@@ -44,14 +44,14 @@ export async function runCollectTrends(deps: CollectDeps): Promise<void> {
       summary,
       articles,
       sourceUrls: articles.map((a) => a.url),
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().replace('Z', '+09:00'),
     });
   }
 }
 
 export const collectTrends = onSchedule(
   {
-    schedule: '50 4,16 * * *',
+    schedule: '0 5 * * *',
     timeZone: 'Asia/Seoul',
     region: 'asia-northeast3',
     secrets: [naverClientId, naverClientSecret, geminiApiKey],

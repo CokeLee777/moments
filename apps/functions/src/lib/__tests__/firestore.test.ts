@@ -1,19 +1,16 @@
 import {
   saveTrendSummary,
   getLatestTrendSummary,
-  getUsersWithNotificationHour,
   upsertUserProfile,
-  clearFcmToken,
 } from '../firestore.js';
 
 const mockSet = jest.fn().mockResolvedValue(undefined);
-const mockUpdate = jest.fn().mockResolvedValue(undefined);
 const mockGet = jest.fn();
 const mockLimit = jest.fn().mockReturnValue({ get: mockGet });
 const mockOrderBy = jest.fn().mockReturnValue({ limit: mockLimit });
 const mockWhereResult = { get: mockGet, orderBy: mockOrderBy };
 const mockWhere = jest.fn().mockReturnValue(mockWhereResult);
-const mockDocRef = { set: mockSet, update: mockUpdate, get: mockGet, id: 'mock-auto-id' };
+const mockDocRef = { set: mockSet, id: 'mock-auto-id' };
 const mockDoc = jest.fn().mockReturnValue(mockDocRef);
 const mockCollection = jest.fn().mockReturnValue({ doc: mockDoc, where: mockWhere });
 
@@ -60,34 +57,11 @@ describe('getLatestTrendSummary', () => {
   });
 });
 
-describe('getUsersWithNotificationHour', () => {
-  it('해당 알림 시간을 가진 FCM 토큰 있는 사용자를 반환한다', async () => {
-    const mockSnapshot = {
-      docs: [
-        { id: 'uid1', data: () => ({ fcmToken: 'token1', topics: ['ai'], notificationTimes: [8], updatedAt: '' }) },
-        { id: 'uid2', data: () => ({ fcmToken: '', topics: ['it'], notificationTimes: [8], updatedAt: '' }) },
-      ],
-    };
-    mockWhere.mockReturnValue({ get: jest.fn().mockResolvedValue(mockSnapshot) });
-
-    const users = await getUsersWithNotificationHour(8);
-    expect(users).toHaveLength(1);
-    expect(users[0].uid).toBe('uid1');
-  });
-});
-
 describe('upsertUserProfile', () => {
   it('users/{uid} 문서를 set한다', async () => {
-    const profile = { fcmToken: 'tok', topics: ['ai' as const], notificationTimes: [8], updatedAt: '' };
-    await upsertUserProfile('uid1', profile);
+    const profile = { topics: ['ai' as const], updatedAt: '' };
+    await upsertUserProfile('uid1', profile as any);
     expect(mockDoc).toHaveBeenCalledWith('uid1');
     expect(mockSet).toHaveBeenCalledWith(profile);
-  });
-});
-
-describe('clearFcmToken', () => {
-  it('fcmToken을 빈 문자열로 업데이트한다', async () => {
-    await clearFcmToken('uid1');
-    expect(mockUpdate).toHaveBeenCalledWith({ fcmToken: '' });
   });
 });

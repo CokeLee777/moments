@@ -1,18 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
-import Svg, { Defs, RadialGradient, Stop, Ellipse } from 'react-native-svg';
 import { Slot, useRouter } from 'expo-router';
-import MobileAds from 'react-native-google-mobile-ads';
+import Head from 'expo-router/head';
 import {
   useFonts,
   NotoSerifKR_900Black,
 } from '@expo-google-fonts/noto-serif-kr';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../lib/firebase';
-import { getUserProfile } from '../lib/firestore';
-import { registerForPushNotifications, setupNotificationListeners } from '../lib/notifications';
+import { AuthProvider, useAuth } from '../lib/auth-context';
 import { ms, s, vs } from '../lib/scale';
 import '../global.css';
+
+const SPLASH_MIN_MS = 1500;
 
 function LoadingScreen() {
   const breatheAnim = useRef(new Animated.Value(0.75)).current;
@@ -23,7 +21,6 @@ function LoadingScreen() {
   ];
 
   useEffect(() => {
-    // "찰나" 숨쉬기 (opacity 0.75 ↔ 1)
     Animated.loop(
       Animated.sequence([
         Animated.timing(breatheAnim, {
@@ -41,7 +38,6 @@ function LoadingScreen() {
       ]),
     ).start();
 
-    // 점 bounce + opacity
     Animated.parallel(
       dotAnims.map((anim, i) =>
         Animated.loop(
@@ -71,7 +67,6 @@ function LoadingScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#060b16', alignItems: 'center', justifyContent: 'center' }}>
-      {/* Glow: SVG RadialGradient — 목업과 동일한 rgba(99,102,241,0.38) 0% → transparent 70% */}
       <View
         style={{
           position: 'absolute',
@@ -85,19 +80,18 @@ function LoadingScreen() {
           ],
         }}
       >
-        <Svg width={glowSize} height={glowSize}>
-          <Defs>
-            <RadialGradient id="glow" cx="50%" cy="50%" rx="50%" ry="50%">
-              <Stop offset="0%" stopColor="#6366f1" stopOpacity="0.38" />
-              <Stop offset="70%" stopColor="#6366f1" stopOpacity="0" />
-              <Stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
-            </RadialGradient>
-          </Defs>
-          <Ellipse cx={glowSize / 2} cy={glowSize / 2} rx={glowSize / 2} ry={glowSize / 2} fill="url(#glow)" />
-        </Svg>
+        <svg width={glowSize} height={glowSize}>
+          <defs>
+            <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.38" />
+              <stop offset="70%" stopColor="#6366f1" stopOpacity="0" />
+              <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <ellipse cx={glowSize / 2} cy={glowSize / 2} rx={glowSize / 2} ry={glowSize / 2} fill="url(#glow)" />
+        </svg>
       </View>
 
-      {/* 글씨 잘림 방지: Animated.View로 감싸기 */}
       <Animated.View style={{ opacity: breatheAnim, paddingVertical: s(4) }}>
         <Text
           style={{
@@ -144,54 +138,54 @@ function LoadingScreen() {
   );
 }
 
-export default function RootLayout() {
+function RootContent() {
   const [fontsLoaded] = useFonts({ NotoSerifKR_900Black });
-  const [authReady, setAuthReady] = useState(false);
-  const [destination, setDestination] = useState<string | null>(null);
+  const [splashMinDone, setSplashMinDone] = useState(false);
+  const { user, profile, authReady } = useAuth();
   const router = useRouter();
+  const lastRouteRef = useRef<string | null>(null);
 
   useEffect(() => {
-    MobileAds().initialize().catch(() => {});
+    const t = setTimeout(() => setSplashMinDone(true), SPLASH_MIN_MS);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        setDestination('/login');
-      } else {
-        try {
-          const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000));
-          const profile = await Promise.race([getUserProfile(user.uid), timeout]);
-          setDestination(profile ? '/(tabs)' : '/onboarding');
-        } catch {
-          setDestination('/onboarding');
-        }
-      }
-      setAuthReady(true);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (authReady && fontsLoaded && destination) {
-      router.replace(destination as never);
-    }
-  }, [authReady, fontsLoaded, destination]);
-
-  useEffect(() => {
-    if (!authReady) return;
-    if (!auth.currentUser) return;
-    void registerForPushNotifications();
-    return setupNotificationListeners();
-  }, [authReady]);
+    if (!authReady || !fontsLoaded || !splashMinDone) return;
+    const dest = !user ? '/login' : !profile ? '/onboarding' : '/(tabs)';
+    if (lastRouteRef.current === dest) return;
+    lastRouteRef.current = dest;
+    (window as Window & { hideSplash?: () => void }).hideSplash?.();
+    router.replace(dest as never);
+  }, [authReady, fontsLoaded, splashMinDone, user, profile]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <Slot />
-      {(!authReady || !fontsLoaded) && (
-        <View style={StyleSheet.absoluteFill}>
-          <LoadingScreen />
-        </View>
-      )}
-    </View>
+    <>
+      <Head>
+        <meta name="theme-color" content="#060b16" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="찰나" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <title>찰나</title>
+      </Head>
+      <View style={{ flex: 1 }}>
+        <Slot />
+        {(!authReady || !fontsLoaded) && (
+          <View style={StyleSheet.absoluteFill}>
+            <LoadingScreen />
+          </View>
+        )}
+      </View>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootContent />
+    </AuthProvider>
   );
 }

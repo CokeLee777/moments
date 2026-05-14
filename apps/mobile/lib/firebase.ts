@@ -1,5 +1,9 @@
 import { getApps, initializeApp } from 'firebase/app';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import {
+  getAuth,
+  initializeAuth,
+  getReactNativePersistence,
+} from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,14 +17,17 @@ const firebaseConfig = {
   appId: Platform.select({
     ios: process.env.EXPO_PUBLIC_FIREBASE_APP_ID_IOS!,
     android: process.env.EXPO_PUBLIC_FIREBASE_APP_ID_ANDROID!,
-    default: process.env.EXPO_PUBLIC_FIREBASE_APP_ID_IOS!,
+    default: process.env.EXPO_PUBLIC_FIREBASE_APP_ID_WEB!,
   }),
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+export const auth =
+  Platform.OS === 'web'
+    ? getAuth(app)
+    : initializeAuth(app, {
+        persistence: getReactNativePersistence(AsyncStorage),
+      });
 
 export const db = getFirestore(app, 'moments');

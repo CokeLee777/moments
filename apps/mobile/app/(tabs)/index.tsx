@@ -1,11 +1,10 @@
 import { useEffect, useState, Fragment } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { auth } from '../../lib/firebase';
-import { getTrendSummary, getUserProfile, UserProfile } from '../../lib/firestore';
+import { useAuth } from '../../lib/auth-context';
+import { getTrendSummary } from '../../lib/firestore';
 import { TrendCard } from '../../components/TrendCard';
 import { NewsItem } from '../../components/NewsItem';
-import { NativeAdCard } from '../../components/NativeAdCard';
 import type { TrendSummary } from '@moments/shared';
 
 const TOPIC_LABELS: Record<string, string> = {
@@ -28,15 +27,9 @@ function formatDateKo(): string {
 }
 
 export default function HomeScreen() {
-  const user = auth.currentUser;
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const { profile } = useAuth();
   const [activeIdx, setActiveIdx] = useState(0);
   const [summary, setSummary] = useState<TrendSummary | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    getUserProfile(user.uid).then(setProfile);
-  }, [user]);
 
   useEffect(() => {
     if (!profile?.topics?.length) return;
@@ -57,7 +50,7 @@ export default function HomeScreen() {
           찰나
         </Text>
         <View style={{ backgroundColor: '#f1f5f9', borderRadius: 10, paddingHorizontal: 9, paddingVertical: 3 }}>
-          <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#64748b', letterSpacing: -0.1 }}>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: '#64748b', letterSpacing: -0.1 }}>
             {formatDateKo()}
           </Text>
         </View>
@@ -70,10 +63,10 @@ export default function HomeScreen() {
             <TouchableOpacity
               key={topicId}
               onPress={() => setActiveIdx(idx)}
-              className="flex-1 pt-2 pb-[7px] items-center"
+              className="flex-1 pt-3 pb-[10px] items-center"
             >
               <Text
-                className={`text-[11px] font-semibold ${
+                className={`text-[13px] font-semibold ${
                   idx === activeIdx ? 'text-primary' : 'text-muted'
                 }`}
               >
@@ -95,14 +88,14 @@ export default function HomeScreen() {
         {summary ? (
           <>
             <TrendCard summary={summary} />
-            <Text style={{ fontSize: 8.5, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingHorizontal: 10, paddingBottom: 5 }}>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: '#94a3b8', letterSpacing: 0.8, textTransform: 'uppercase', paddingHorizontal: 10, paddingBottom: 5 }}>
               관련 뉴스
             </Text>
             <View style={{ paddingHorizontal: 10, gap: 4 }}>
               {summary.articles.map((article, i) => (
                 <Fragment key={`${summary.topicId}-${i}`}>
                   <NewsItem article={article} />
-                  {i === 1 && summary.articles.length > 2 && <NativeAdCard />}
+                  {/* {i === 1 && summary.articles.length > 2 && <WebAdCard />} */}
                 </Fragment>
               ))}
             </View>

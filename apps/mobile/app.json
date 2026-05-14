@@ -2,67 +2,20 @@
   "expo": {
     "name": "찰나",
     "slug": "moments",
-    "scheme": "moments",
     "version": "1.0.0",
-    "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#060b16"
-    },
-    "ios": {
-      "supportsTablet": false,
-      "bundleIdentifier": "com.moments.app",
-      "googleServicesFile": "./GoogleService-Info.plist",
-      "infoPlist": {
-        "CFBundleURLTypes": [
-          {
-            "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.97704265353-kgv8isqr79i4895l49q43fq4qaqndkj3"
-            ]
-          }
-        ]
-      }
-    },
-    "android": {
-      "package": "com.moments.app",
-      "googleServicesFile": "./google-services.json",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#060b16"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
-    },
     "web": {
+      "bundler": "metro",
+      "output": "static",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router",
-      "expo-font",
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/icon.png",
-          "color": "#3b82f6"
-        }
-      ],
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
-        }
-      ]
+      "expo-font"
     ],
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "95c71265-8501-45ca-b038-f76477ae19c1"
-      }
+      "router": {}
     }
   }
 }

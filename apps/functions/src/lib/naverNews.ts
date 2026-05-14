@@ -30,9 +30,9 @@ export async function fetchNaverNews(
   query: string,
   clientId: string,
   clientSecret: string,
-  display = 5
+  display = 10
 ): Promise<NaverArticle[]> {
-  const url = `https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(query)}&display=${display}&sort=date`;
+  const url = `https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(query)}&display=${display}&sort=sim`;
   const res = await fetch(url, {
     headers: {
       'X-Naver-Client-Id': clientId,

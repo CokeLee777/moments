@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Easing, Text, View } from 'react-native';
-import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import type { TrendSummary } from '@moments/shared';
+import { MarkdownText } from './MarkdownText';
 import { ms } from '../lib/scale';
 
 interface Props {
@@ -43,36 +43,36 @@ export function TrendCard({ summary }: Props) {
       }}
     >
       {/* 배경: SVG radial-gradient(ellipse at 85% 15%, indigo 0%, transparent 55%) + (ellipse at 5% 85%, blue 0%, transparent 50%) */}
-      <Svg
+      <svg
         style={{ position: 'absolute', top: 0, left: 0 }}
         width={cardSize.w}
         height={cardSize.h}
       >
-        <Defs>
-          <RadialGradient
+        <defs>
+          <radialGradient
             id="trendG1"
             cx={cardSize.w * 0.85}
             cy={cardSize.h * 0.15}
             r={cardSize.w * 0.7}
             gradientUnits="userSpaceOnUse"
           >
-            <Stop offset="0%" stopColor="#6366f1" stopOpacity="0.55" />
-            <Stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
-          </RadialGradient>
-          <RadialGradient
+            <stop offset="0%" stopColor="#6366f1" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient
             id="trendG2"
             cx={cardSize.w * 0.05}
             cy={cardSize.h * 0.85}
             r={cardSize.w * 0.65}
             gradientUnits="userSpaceOnUse"
           >
-            <Stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
-            <Stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
-          </RadialGradient>
-        </Defs>
-        <Rect width={cardSize.w} height={cardSize.h} fill="url(#trendG1)" />
-        <Rect width={cardSize.w} height={cardSize.h} fill="url(#trendG2)" />
-      </Svg>
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <rect width={cardSize.w} height={cardSize.h} fill="url(#trendG1)" />
+        <rect width={cardSize.w} height={cardSize.h} fill="url(#trendG2)" />
+      </svg>
 
       <View style={{ padding: 13 }}>
         {/* AI 요약 배지 */}
@@ -99,7 +99,7 @@ export function TrendCard({ summary }: Props) {
           />
           <Text
             style={{
-              fontSize: 7.5,
+              fontSize: 10,
               fontWeight: '800',
               color: 'rgba(255,255,255,0.8)',
               letterSpacing: 0.8,
@@ -113,18 +113,21 @@ export function TrendCard({ summary }: Props) {
         {/* 제목 */}
         <Text
           className="text-white font-extrabold"
-          style={{ fontSize: ms(12.5), letterSpacing: -0.3, lineHeight: ms(12.5) * 1.3, marginBottom: 5 }}
+          style={{ fontSize: ms(14), letterSpacing: -0.3, lineHeight: ms(14) * 1.3, marginBottom: 5 }}
         >
           {summary.title}
         </Text>
 
         {/* 요약 본문 */}
-        <Text
+        <MarkdownText
+          fontSize={12}
+          color="rgba(255,255,255,0.68)"
+          lineHeight={12 * 1.65}
           numberOfLines={5}
-          style={{ fontSize: 9, color: 'rgba(255,255,255,0.68)', lineHeight: 9 * 1.65 }}
+          boldColor="white"
         >
           {summary.summary}
-        </Text>
+        </MarkdownText>
       </View>
     </View>
   );
