@@ -15,6 +15,7 @@ import { useAuth } from '../../lib/auth-context';
 import { getRecentTrendSummaries } from '../../lib/firestore';
 import { MarkdownText } from '../../components/MarkdownText';
 import type { TrendSummary } from '@moments/shared';
+import { WebAdCard } from '../../components/WebAdCard';
 
 const TOPIC_DOT_BG: Record<string, string> = {
   ai: '#eff6ff',
@@ -125,13 +126,19 @@ export default function HistoryScreen() {
     | { type: 'ad'; key: string };
 
   const flat: FlatItem[] = [];
+  const totalItems = summaries.length;
   let count = 0;
-  for (const group of groups) {
+  for (let gi = 0; gi < groups.length; gi++) {
+    const group = groups[gi];
     flat.push({ type: 'label', label: group.label, key: `label-${group.label}` });
-    for (const item of group.items) {
-      flat.push({ type: 'item', item, key: item.id });
+    for (let ii = 0; ii < group.items.length; ii++) {
+      flat.push({ type: 'item', item: group.items[ii], key: group.items[ii].id });
       count += 1;
-      if (count % 3 === 0) flat.push({ type: 'ad', key: `ad-${count}` });
+      const isGroupBoundary = ii === group.items.length - 1 && gi < groups.length - 1;
+      const isListEnd = gi === groups.length - 1 && ii === group.items.length - 1;
+      if (totalItems >= 5 && count % 5 === 0 && !isGroupBoundary && !isListEnd) {
+        flat.push({ type: 'ad', key: `ad-${count}` });
+      }
     }
   }
 
@@ -173,7 +180,7 @@ export default function HistoryScreen() {
               );
             }
             if (entry.type === 'ad') {
-              return null; // return <WebAdCard key={entry.key} />;
+              return <WebAdCard key={entry.key} />;
             }
             const item = entry.item;
             return (

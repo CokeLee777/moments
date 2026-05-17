@@ -6,6 +6,7 @@ import { getTrendSummary } from '../../lib/firestore';
 import { TrendCard } from '../../components/TrendCard';
 import { NewsItem } from '../../components/NewsItem';
 import type { TrendSummary } from '@moments/shared';
+import { WebAdCard } from '../../components/WebAdCard';
 
 const TOPIC_LABELS: Record<string, string> = {
   it: 'IT',
@@ -95,7 +96,7 @@ export default function HomeScreen() {
               {summary.articles.map((article, i) => (
                 <Fragment key={`${summary.topicId}-${i}`}>
                   <NewsItem article={article} />
-                  {/* {i === 1 && summary.articles.length > 2 && <WebAdCard />} */}
+                  {i === 1 && summary.articles.length > 2 && <WebAdCard />}
                 </Fragment>
               ))}
             </View>

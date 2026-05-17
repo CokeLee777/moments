@@ -169,6 +169,12 @@ function RootContent() {
         <meta name="apple-mobile-web-app-title" content="찰나" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <title>찰나</title>
+        <meta name="google-adsense-account" content="ca-pub-1265951958398504" />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1265951958398504"
+          crossOrigin="anonymous"
+        />
       </Head>
       <View style={{ flex: 1 }}>
         <Slot />

@@ -84,8 +84,6 @@ export default function SettingsScreen() {
           <Text className="text-red-500 font-bold text-[14px]">로그아웃</Text>
         </Pressable>
 
-        {/* 웹 광고 — 로그아웃 버튼 아래 */}
-        {/* <WebAdCard /> */}
       </View>
     </SafeAreaView>
   );

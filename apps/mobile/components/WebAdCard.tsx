@@ -14,6 +14,11 @@ export function WebAdCard() {
     const el = ref.current as unknown as HTMLElement | null;
     if (!el) return;
 
+    // AdSense JS modifies the ins element's height directly; isolate it inside
+    // an absolutely-positioned clipper so it can't push the container taller.
+    const clipper = document.createElement('div');
+    clipper.style.cssText = 'position:absolute;inset:0;overflow:hidden;';
+
     const ins = document.createElement('ins');
     ins.className = 'adsbygoogle';
     ins.style.display = 'block';
@@ -21,10 +26,11 @@ export function WebAdCard() {
     ins.dataset.adSlot = process.env.EXPO_PUBLIC_ADSENSE_SLOT ?? '';
     ins.dataset.adFormat = 'auto';
     ins.dataset.fullWidthResponsive = 'true';
-    el.appendChild(ins);
 
-    window.adsbygoogle = window.adsbygoogle || [];
-    window.adsbygoogle.push({});
+    clipper.appendChild(ins);
+    el.appendChild(clipper);
+
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
   }, []);
 
   return (
@@ -33,10 +39,11 @@ export function WebAdCard() {
       style={{
         backgroundColor: '#fff',
         borderRadius: 16,
-        minHeight: 80,
+        height: 68,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.045)',
         overflow: 'hidden',
+        position: 'relative',
       }}
     />
   );
